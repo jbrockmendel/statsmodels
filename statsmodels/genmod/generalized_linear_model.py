@@ -27,7 +27,7 @@ import statsmodels.base.model as base
 import statsmodels.regression.linear_model as lm
 import statsmodels.base.wrapper as wrap
 import statsmodels.regression._tools as reg_tools
-
+from statsmodels.tools import eval_measures
 
 from statsmodels.graphics._regressionplots_doc import (
     _plot_added_variable_doc,
@@ -297,16 +297,16 @@ class GLM(base.LikelihoodModel):
         self.normalized_cov_params = np.dot(self.pinv_wexog,
                                             np.transpose(self.pinv_wexog))
 
-        self.df_model = np_matrix_rank(self.exog) - 1
+        self.df_model = np_matrix_rank(self.exog) - 1 # TODO: "should this have a 'assumes constant' comment?"
 
 
         if (self.freq_weights is not None) and \
            (self.freq_weights.shape[0] == self.endog.shape[0]):
             self.wnobs = self.freq_weights.sum()
-            self.df_resid = self.wnobs - self.df_model - 1
         else:
             self.wnobs = self.exog.shape[0]
-            self.df_resid = self.exog.shape[0] - self.df_model - 1
+        
+        self.df_resid = self.wnobs - self.df_model - 1
 
     def _check_inputs(self, family, offset, exposure, endog, freq_weights):
 
@@ -1158,12 +1158,16 @@ class GLM(base.LikelihoodModel):
         res._results.params = params
         res._results.normalized_cov_params = cov
         k_constr = len(q)
+
+        assert False
+        assert res._results.df_model == np_matrix_rank(self.exog) - 1, (res._results.df_model, np_matrix_rank(self.exog))
+        assert res._results.df_resid == self.wnobs - self.df_model - 1
         res._results.df_resid += k_constr
         res._results.df_model -= k_constr
         res._results.constraints = lc
         res._results.k_constr = k_constr
         res._results.results_constrained = res_constr
-        # TODO: the next is not the best. history should bin in results
+        # TODO: the next is not the best. history should be in results
         res._results.model.history = res_constr.model.history
         return res
 
@@ -1391,7 +1395,8 @@ class GLMResults(base.LikelihoodModelResults):
 
     @cache_readonly
     def aic(self):
-        return -2 * self.llf + 2*(self.df_model+1)
+        return eval_measures.aic(self.llf, self.nobs, self.df_model+1)
+        #return -2 * self.llf + 2*(self.df_model+1)
 
     @cache_readonly
     def bic(self):
