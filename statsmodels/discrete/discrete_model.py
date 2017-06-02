@@ -30,6 +30,7 @@ from statsmodels.tools.decorators import (resettable_cache,
 from statsmodels.regression.linear_model import OLS
 from scipy import stats, special, optimize  # opt just for nbin
 from scipy.stats import nbinom
+from statsmodels.tools import eval_measures
 from statsmodels.tools.sm_exceptions import PerfectSeparationError
 from statsmodels.tools.numdiff import (approx_fprime, approx_hess,
                                        approx_hess_cs, approx_fprime_cs)
@@ -161,10 +162,10 @@ class DiscreteModel(base.LikelihoodModel):
         statsmodels.model.LikelihoodModel.__init__
         and should contain any preprocessing that needs to be done for a model.
         """
-        # assumes constant
-        self.df_model = float(np_matrix_rank(self.exog) - 1)
-        self.df_resid = (float(self.exog.shape[0] -
-                         np_matrix_rank(self.exog)))
+        rank = float(np_matrix_rank(self.exog))
+        self._rank = rank
+        self.df_model = rank - 1 # assumes constant
+        self.df_resid = self.exog.shape[0] - rank
 
     def cdf(self, X):
         """
@@ -539,7 +540,8 @@ class MultinomialModel(BinaryModel):
         self.endog = self.endog.argmax(1)  # turn it into an array of col idx
         self.J = self.wendog.shape[1]
         self.K = self.exog.shape[1]
-        self.df_model *= (self.J-1)  # for each J - 1 equation.
+        # for each J - 1 equation. 
+        self.df_model = (self._rank - 1) * (self.J-1)  # assumes constant
         self.df_resid = self.exog.shape[0] - self.df_model - (self.J-1)
 
     def predict(self, params, exog=None, linear=False):
@@ -1076,8 +1078,10 @@ class Poisson(CountModel):
         res._results.params = params
         res._results.normalized_cov_params = cov
         k_constr = len(q)
-        res._results.df_resid += k_constr
-        res._results.df_model -= k_constr
+
+        res._results.df_model = (self._rank - 1) - k_constr # assumes constant
+        res._results.df_resid = self.exog.shape[0] - self._rank + k_constr
+        
         res._results.constraints = lc
         res._results.k_constr = k_constr
         res._results.results_constrained = res_constr
@@ -2410,11 +2414,13 @@ class DiscreteResults(base.LikelihoodModelResults):
 
     @cache_readonly
     def aic(self):
-        return -2*(self.llf - (self.df_model+1))
+        return eval_measures.aic(self.llf, self.nobs, self.df_model+1)
+        #return -2*(self.llf - (self.df_model+1))
 
     @cache_readonly
     def bic(self):
-        return -2*self.llf + np.log(self.nobs)*(self.df_model+1)
+        return eval_measures.bic(self.llf, self.nobs, self.df_model+1)
+        #return -2*self.llf + np.log(self.nobs)*(self.df_model+1)
 
     def _get_endog_name(self, yname, yname_list):
         if yname is None:
@@ -2641,14 +2647,15 @@ class NegativeBinomialResults(CountResults):
     def aic(self):
         # + 1 because we estimate alpha
         k_extra = getattr(self.model, 'k_extra', 0)
-        return -2*(self.llf - (self.df_model + self.k_constant + k_extra))
+        return eval_measures.aic(self.llf, self.nobs, self.df_model+self.k_constant+k_extra)
+        #return -2*(self.llf - (self.df_model + self.k_constant + k_extra))
 
     @cache_readonly
     def bic(self):
         # + 1 because we estimate alpha
         k_extra = getattr(self.model, 'k_extra', 0)
-        return -2*self.llf + np.log(self.nobs)*(self.df_model +
-                                                self.k_constant + k_extra)
+        return eval_measures.bic(self.llf, self.nobs, self.df_model+self.k_constant+k_extra)
+        #return -2*self.llf + np.log(self.nobs)*(self.df_model + self.k_constant + k_extra)
 
 class L1CountResults(DiscreteResults):
     __doc__ = _discrete_results_docs % {"one_line_description" :
@@ -2954,11 +2961,13 @@ class MultinomialResults(DiscreteResults):
 
     @cache_readonly
     def aic(self):
-        return -2*(self.llf - (self.df_model+self.model.J-1))
+        return eval_measures.aic(self.llf, self.nobs, self.df_model+self.model.J-1)
+        #return -2*(self.llf - (self.df_model+self.model.J-1))
 
     @cache_readonly
     def bic(self):
-        return -2*self.llf + np.log(self.nobs)*(self.df_model+self.model.J-1)
+        return eval_measures.bic(self.llf, self.nobs, self.df_model+self.model.J-1)
+        #return -2*self.llf + np.log(self.nobs)*(self.df_model+self.model.J-1)
 
     def conf_int(self, alpha=.05, cols=None):
         confint = super(DiscreteResults, self).conf_int(alpha=alpha,
