@@ -1159,7 +1159,7 @@ class GLM(base.LikelihoodModel):
         res._results.normalized_cov_params = cov
         k_constr = len(q)
 
-        assert False
+        assert False # FIXME
         assert res._results.df_model == np_matrix_rank(self.exog) - 1, (res._results.df_model, np_matrix_rank(self.exog))
         assert res._results.df_resid == self.wnobs - self.df_model - 1
         res._results.df_resid += k_constr
