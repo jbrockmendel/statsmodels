@@ -124,12 +124,14 @@ class RLM(base.LikelihoodModel):
         Resets the history and number of iterations.
         """
         self.pinv_wexog = np.linalg.pinv(self.exog)
-        self.normalized_cov_params = np.dot(self.pinv_wexog,
-                                        np.transpose(self.pinv_wexog))
-        self.df_resid = (np.float(self.exog.shape[0] -
-                         np_matrix_rank(self.exog)))
-        self.df_model = np.float(np_matrix_rank(self.exog)-1)
+        self.normalized_cov_params = np.dot(self.pinv_wexog, self.pinv_wexog.T)
+
         self.nobs = float(self.endog.shape[0])
+        
+        # TODO: Should we have a comment about 'assume constant'?
+        rank = float(np_matrix_rank(self.exog)) # TODO: Should we set rank attribute?
+        self.df_model = rank - 1
+        self.df_resid = self.nobs - (self.df_model + 1)
 
     def score(self, params):
         raise NotImplementedError

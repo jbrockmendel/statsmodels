@@ -298,14 +298,16 @@ def fit_constrained_wrap(model, constraints, start_params=None, **fit_kwds):
     params, cov, res_constr = fit_constrained(self, R, q,
                                               start_params=start_params,
                                               fit_kwds=fit_kwds)
+    k_constr = len(q)
     #create dummy results Instance, TODO: wire up properly
     res = self.fit(start_params=params, maxiter=0,
-                   warn_convergence=False) # we get a wrapper back
+                   warn_convergence=False, k_constr=k_constr) # we get a wrapper back
+    
     res._results.params = params
     res._results.normalized_cov_params = cov
-    k_constr = len(q)
     res._results.df_resid += k_constr
     res._results.df_model -= k_constr
+    # TODO: Avoid incrementing inplace
     res._results.constraints = lc
     res._results.k_constr = k_constr
     res._results.results_constrained = res_constr

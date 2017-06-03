@@ -47,6 +47,8 @@ class Anes(object):
         self.prsquared = .1647810465387
         self.df_model = 30
         self.df_resid = 944 - 36
+        # Note: len(params) = 36, so df_model is len(params) - (J-1)
+        # Not obvious to me (Brock 2017-06-02) whether "assumes constant" is pertinent
         self.J = 7
         self.K = 6
         self.aic = 2995.84549462
@@ -480,6 +482,10 @@ class Spector(object):
         self.llnull = -20.5917296966173
         self.df_model = 3
         self.df_resid = 32 - 4  #TODO: is this right? not reported in stata
+        # Note to previous commenter: It is consistent with
+        # the nobs - (df_model+1) pattern, and with df_model
+        # equalling len(params) - 1
+        # Note: nobs = 32
         self.llr = 15.4041924625676
         self.prsquared = .374038332124624
         self.llr_pvalue = .00150187761112892
@@ -739,7 +745,10 @@ class RandHIE(object):
         self.llf = -62419.588535018
         self.llnull = -66647.181687959
         self.df_model = 9
-        self.df_resid = self.nobs - self.df_model - 1
+        self.df_resid = self.nobs - (self.df_model + 1) # TODO: does this have an assumed constant?
+        # Note: len(self.params) is 10, so df_model is (probably) not including 
+        # the constant.  That is consistent with the extra 1 being subtracted
+        # when defining df_resid
         self.llr = 8455.186305881856
         self.prsquared = .0634324369893758
         self.llr_pvalue = 0

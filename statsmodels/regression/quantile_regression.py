@@ -141,8 +141,8 @@ class QuantReg(RegressionModel):
         nobs = self.nobs
         exog_rank = np_matrix_rank(self.exog)
         self.rank = exog_rank
-        self.df_model = float(self.rank - self.k_constant)
-        self.df_resid = self.nobs - self.rank
+        self.df_model = float(self.rank) - self.k_constant
+        self.df_resid = self.nobs - (self.df_model + self.k_constant)
         n_iter = 0
         xstar = exog
 

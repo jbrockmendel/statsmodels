@@ -164,8 +164,9 @@ class DiscreteModel(base.LikelihoodModel):
         """
         rank = float(np_matrix_rank(self.exog))
         self._rank = rank
+        self.nobs = self.exog.shape[0] # TODO: Should we set this attribute here?
         self.df_model = rank - 1 # assumes constant
-        self.df_resid = self.exog.shape[0] - rank
+        self.df_resid = self.nobs - (self.df_model+1)
 
     def cdf(self, X):
         """
@@ -540,9 +541,10 @@ class MultinomialModel(BinaryModel):
         self.endog = self.endog.argmax(1)  # turn it into an array of col idx
         self.J = self.wendog.shape[1]
         self.K = self.exog.shape[1]
+        nobs = self.exog.shape[0] # TODO: Should we set this attribute here?
         # for each J - 1 equation. 
         self.df_model = (self._rank - 1) * (self.J-1)  # assumes constant
-        self.df_resid = self.exog.shape[0] - self.df_model - (self.J-1)
+        self.df_resid = nobs - (self.df_model + (self.J-1))
 
     def predict(self, params, exog=None, linear=False):
         """
@@ -1065,23 +1067,25 @@ class Poisson(CountModel):
 
         # TODO: add start_params option, need access to tranformation
         #       fit_constrained needs to do the transformation
-        params, cov, res_constr = fit_constrained(self, R, q,
+        (params, cov, res_constr) = fit_constrained(self, R, q,
                                                   start_params=start_params,
                                                   fit_kwds=fit_kwds)
+        k_constr = len(q)
         #create dummy results Instance, TODO: wire up properly
         res = self.fit(maxiter=0, method='nm', disp=0,
-                       warn_convergence=False) # we get a wrapper back
-        res.mle_retvals['fcall'] = res_constr.mle_retvals.get('fcall', np.nan)
-        res.mle_retvals['iterations'] = res_constr.mle_retvals.get(
-                                                        'iterations', np.nan)
-        res.mle_retvals['converged'] = res_constr.mle_retvals['converged']
+                       warn_convergence=False, k_constr=k_constr) # we get a wrapper back
+        
+        mle_retvals = res_constr.mle_retvals
+        # TODO: Why not just set res.mle_retvals to res_constr.mle_retvals?
+        res.mle_retvals['fcall'] = mle_retvals.get('fcall', np.nan)
+        res.mle_retvals['iterations'] = mle_retvals.get('iterations', np.nan)
+        res.mle_retvals['converged'] = mle_retvals['converged']
         res._results.params = params
         res._results.normalized_cov_params = cov
-        k_constr = len(q)
 
         res._results.df_model = (self._rank - 1) - k_constr # assumes constant
-        res._results.df_resid = self.exog.shape[0] - self._rank + k_constr
-        
+        res._results.df_resid = self.nobs - (res._results.df_model+1)
+
         res._results.constraints = lc
         res._results.k_constr = k_constr
         res._results.results_constrained = res_constr
@@ -2674,9 +2678,9 @@ class L1CountResults(DiscreteResults):
         # adjust for extra parameter in NegativeBinomial nb1 and nb2
         # extra parameter is not included in df_model
         k_extra = getattr(self.model, 'k_extra', 0)
-                
+        
         self.df_model = self.nnz_params - 1 - k_extra
-        self.df_resid = float(self.model.endog.shape[0] - self.nnz_params) + k_extra
+        self.df_resid = self.nobs - (self.df_model+1)
 
 class PoissonResults(CountResults):
     def predict_prob(self, n=None, exog=None, exposure=None, offset=None,
@@ -2903,7 +2907,7 @@ class L1BinaryResults(BinaryResults):
         self.trimmed = bnryfit.mle_retvals['trimmed']
         self.nnz_params = (self.trimmed == False).sum()
         self.df_model = self.nnz_params - 1
-        self.df_resid = float(self.model.endog.shape[0] - self.nnz_params)
+        self.df_resid = self.nobs - (self.df_model+1)
 
 
 class MultinomialResults(DiscreteResults):
@@ -3054,7 +3058,10 @@ class L1MultinomialResults(MultinomialResults):
 
         # Note: J-1 constants
         self.df_model = self.nnz_params - (self.model.J - 1)
-        self.df_resid = float(self.model.endog.shape[0] - self.nnz_params)
+        self.df_resid = self.nobs - self.nnz_params
+        # TODO: Can we write df_resid as
+        # `self.nobs - (self.df_model+k_something_meaningful)`
+        # by interpreting `self.model.J-1` as analogous to e.g. k_constant?
 
 
 #### Results Wrappers ####

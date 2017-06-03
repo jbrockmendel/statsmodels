@@ -99,14 +99,18 @@ class IV2SLS(LikelihoodModel):
     """
 
     def __init__(self, endog, exog, instrument=None):
-        self.instrument, self.instrument_names = _ensure_2d(instrument, True)
+        (self.instrument, self.instrument_names) = _ensure_2d(instrument, True)
         super(IV2SLS, self).__init__(endog, exog)
         # where is this supposed to be handled
         # Note: Greene p.77/78 dof correction is not necessary (because only
         #       asy results), but most packages do it anyway
-        self.df_resid = self.exog.shape[0] - self.exog.shape[1]
-        #self.df_model = float(self.rank - self.k_constant)
-        self.df_model = float(self.exog.shape[1] - self.k_constant)
+        
+        (nobs, k_exog) = self.exog.shape
+        # TODO: are these already available as attributes?  If not, should we set them here?
+
+        #self.df_model = float(self.rank) - self.k_constant
+        self.df_model = float(k_exog) - self.k_constant
+        self.df_resid = nobs - (self.df_model + self.k_constant)
 
     def initialize(self):
         self.wendog = self.endog

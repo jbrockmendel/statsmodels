@@ -302,7 +302,7 @@ class RegressionModel(base.LikelihoodModel):
         if self._df_model is None:
             self._df_model = float(self.rank - self.k_constant)
         if self._df_resid is None:
-            self.df_resid = self.nobs - self.rank
+            self.df_resid = self.nobs - (self.df_model + self.k_constant)
 
         if isinstance(self, OLS):
             lfit = OLSResults(

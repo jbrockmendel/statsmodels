@@ -306,7 +306,7 @@ class GLM(base.LikelihoodModel):
         else:
             self.wnobs = self.exog.shape[0]
         
-        self.df_resid = self.wnobs - self.df_model - 1
+        self.df_resid = self.wnobs - (self.df_model + 1)
 
     def _check_inputs(self, family, offset, exposure, endog, freq_weights):
 
@@ -1159,11 +1159,11 @@ class GLM(base.LikelihoodModel):
         res._results.normalized_cov_params = cov
         k_constr = len(q)
 
-        assert False # FIXME
-        assert res._results.df_model == np_matrix_rank(self.exog) - 1, (res._results.df_model, np_matrix_rank(self.exog))
-        assert res._results.df_resid == self.wnobs - self.df_model - 1
-        res._results.df_resid += k_constr
-        res._results.df_model -= k_constr
+        # TODO: Should we have a comment about 'assumes constant' somewhere?
+        rank = np_matrix_rank(self.exog)
+        res._results.df_model = rank - 1 - k_constr
+        res._results.df_resid = self.wnobs - (res._results.df_model + 1)
+
         res._results.constraints = lc
         res._results.k_constr = k_constr
         res._results.results_constrained = res_constr
@@ -1400,9 +1400,7 @@ class GLMResults(base.LikelihoodModelResults):
 
     @cache_readonly
     def bic(self):
-        return (self.deviance -
-                (self.model.wnobs - self.df_model - 1) *
-                np.log(self.model.wnobs))
+        return self.deviance - self.df_resid * np.log(self.model.wnobs)
 
 
     def get_prediction(self, exog=None, exposure=None, offset=None,

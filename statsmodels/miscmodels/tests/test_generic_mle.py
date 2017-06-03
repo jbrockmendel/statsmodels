@@ -105,7 +105,9 @@ class TestMyPareto1(CheckGenericMixin):
         mod_par = MyPareto(rvs)
         mod_par.fixed_params = None
         mod_par.fixed_paramsmask = None
-        mod_par.df_model = 3
+        mod_par.df_model = np.array(params).size #3
+        # TODO: set mod_par.nobs attribute to mod_par.endog.shape[0]
+        # assert mod_par.nobs == mod_par.endog.shape[0], (mod_par.nobs, mod_par.endog.shape[0])
         mod_par.df_resid = mod_par.endog.shape[0] - mod_par.df_model
         mod_par.data.xnames = ['shape', 'loc', 'scale']
 
@@ -140,8 +142,12 @@ class TestMyParetoRestriction(CheckGenericMixin):
         mod_par.fixed_params = fixdf
         mod_par.fixed_paramsmask = np.isnan(fixdf)
         mod_par.start_params = mod_par.start_params[mod_par.fixed_paramsmask]
+
+        # TODO: set mod_par.df_model to np.array(params).size - k_constr
+        # after defining k_constr appropriately
         mod_par.df_model = 2
-        mod_par.df_resid = mod_par.endog.shape[0] - mod_par.df_model
+        assert mod_par.endog.shape[0] == nobs, (mod_par.endog.shape[0], nobs)
+        mod_par.df_resid = nobs - mod_par.df_model
         mod_par.data.xnames = ['shape', 'scale']
 
         self.mod = mod_par

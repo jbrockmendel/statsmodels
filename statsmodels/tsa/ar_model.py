@@ -693,7 +693,9 @@ class ARResults(tsbase.TimeSeriesModelResults):
         self.trendorder = trendorder
         #TODO: cmle vs mle?
         self.df_model = k_ar + k_trend
-        self.df_resid = self.model.df_resid = n_totobs - self.df_model
+        # TODO: Can we write df_model in terms of something like params.size?
+        self.df_resid = n_totobs - self.df_model
+        # TODO: Should df_resid be `nobs - df_model`?  See discussion in #3568
 
     @cache_writable()
     def sigma2(self):

@@ -1380,7 +1380,9 @@ class ARMAResults(tsbase.TimeSeriesModelResults):
         k_ma = model.k_ma
         self.k_ma = k_ma
         df_model = k_exog + k_trend + k_ar + k_ma
+        # TODO: can we write df_model in terms of something like params.size?
         self._ic_df_model = df_model + 1
+        # TODO: Deprecate _ic_df_model; it isn't defined in any other models.
         self.df_model = df_model
         self.df_resid = self.nobs - df_model
         self._cache = resettable_cache()
@@ -1449,17 +1451,17 @@ class ARMAResults(tsbase.TimeSeriesModelResults):
 
     @cache_readonly
     def aic(self):
-        return -2 * self.llf + 2 * self._ic_df_model
+        return -2 * self.llf + 2 * (self.df_model+1)
 
     @cache_readonly
     def bic(self):
         nobs = self.nobs
-        return -2 * self.llf + np.log(nobs) * self._ic_df_model
+        return -2 * self.llf + np.log(nobs) * (self.df_model+1)
 
     @cache_readonly
     def hqic(self):
         nobs = self.nobs
-        return -2 * self.llf + 2 * np.log(np.log(nobs)) * self._ic_df_model
+        return -2 * self.llf + 2 * np.log(np.log(nobs)) * (self.df_model+1)
 
     @cache_readonly
     def fittedvalues(self):

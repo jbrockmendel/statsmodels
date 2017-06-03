@@ -42,11 +42,11 @@ class Results(object):
 ##            pass
 ##        return r, R, cov_x
 ##
-##def _general_function(params, xdata, ydata, function):
-##    return function(xdata, *params) - ydata
+##def _general_function(params, xdata, endog, function):
+##    return function(xdata, *params) - endog
 ##
-##def _weighted_general_function(params, xdata, ydata, function, weights):
-##    return weights * (function(xdata, *params) - ydata)
+##def _weighted_general_function(params, xdata, endog, function, weights):
+##    return weights * (function(xdata, *params) - endog)
 ##
 
 
@@ -114,7 +114,7 @@ class NonlinearLS(Model):  #or subclass a model
             missing='none'):
         self.endog = endog
         self.exog = exog
-        if not sigma is None:
+        if sigma is not None:
             sigma = np.asarray(sigma)
             if sigma.ndim < 2:
                 self.sigma = sigma
@@ -123,6 +123,7 @@ class NonlinearLS(Model):  #or subclass a model
                 raise ValueError('correlated errors are not handled yet')
         else:
             self.weights = None
+            # TODO: Should self.sigma be set to None in this case?
 
     def predict(self, exog, params=None):
         #copied from GLS, Model has different signature
@@ -138,16 +139,17 @@ class NonlinearLS(Model):  #or subclass a model
     def geterrors(self, params, weights=None):
         if weights is None:
             if self.weights is None:
-                return self.endog - self._predict(params)
+                weights = 1
             else:
                 weights = self.weights
         return weights * (self.endog - self._predict(params))
 
-    def errorsumsquares(self, params):
+    def errorsumsquares(self, params): # TODO: used?  needed?
         return (self.geterrors(params)**2).sum()
 
 
-    def fit(self, start_value=None, nparams=None, **kw):
+    # TODO: should this be changed to use "start_params" like everywhere else?
+    def fit(self, start_value=None, nparams=None, **kw): 
         #if hasattr(self, 'start_value'):
         #I added start_value even if it's empty, not sure about it
         #but it makes a visible placeholder
@@ -169,23 +171,25 @@ class NonlinearLS(Model):  #or subclass a model
         res = optimize.leastsq(func, p0, full_output=1, **kw)
         (popt, pcov, infodict, errmsg, ier) = res
 
-        if ier not in [1,2,3,4]:
+        if ier not in range(1, 5):
             msg = "Optimal parameters not found: " + errmsg
             raise RuntimeError(msg)
 
         err = infodict['fvec']
 
-        ydata = self.endog
-        if (len(ydata) > len(p0)) and pcov is not None:
-            #this can use the returned errors instead of recalculating
+        nobs = len(self.endog) # TODO: Should this be set as an attribute?
+        k_params = len(p0)
 
-            s_sq = (err**2).sum()/(len(ydata)-len(p0))
+        if (nobs > k_params) and pcov is not None:
+            #this can use the returned errors instead of recalculating
+            s_sq = (err**2).sum() / (nobs-k_params)
             pcov = pcov * s_sq
         else:
             pcov = None
 
-        self.df_resid = len(ydata)-len(p0)
-        self.df_model = len(p0)
+        self.df_model = k_params # TODO: should this involve a 'assume constant'?
+        self.df_resid = nobs - self.df_model
+        
         fitres = Results()
         fitres.params = popt
         fitres.pcov = pcov
@@ -193,22 +197,21 @@ class NonlinearLS(Model):  #or subclass a model
         self.wendog = self.endog  #add weights
         self.wexog = self.jac_predict(popt)
         pinv_wexog = np.linalg.pinv(self.wexog)
-        self.normalized_cov_params = np.dot(pinv_wexog,
-                                         np.transpose(pinv_wexog))
+        self.normalized_cov_params = np.dot(pinv_wexog, pinv_wexog.T)
 
         #TODO: check effect of `weights` on result statistics
         #I think they are correctly included in cov_params
         #maybe not anymore, I'm not using pcov of leastsq
         #direct calculation with jac_predict misses the weights
 
-##        if not weights is None
-##            fitres.wexogw = self.weights * self.jacpredict(popt)
+        #if weights is not None:
+        #    fitres.wexogw = self.weights * self.jacpredict(popt)
         from statsmodels.regression import RegressionResults
         results = RegressionResults
 
         beta = popt
         lfit = RegressionResults(self, beta,
-                       normalized_cov_params=self.normalized_cov_params)
+                    normalized_cov_params=self.normalized_cov_params)
 
         lfit.fitres = fitres   #mainly for testing
         self._results = lfit
@@ -228,14 +231,14 @@ class NonlinearLS(Model):  #or subclass a model
         '''
 
         if nparams is None:
-                nparams = self.nparams
+            nparams = self.nparams
         if rvs_generator is None:
             rvs = np.random.uniform(low=-10, high=10, size=(ntries, nparams))
         else:
             rvs = rvs_generator(size=(ntries, nparams))
 
         results = np.array([np.r_[self.fit_minimal(rv),  rv] for rv in rvs])
-        #selct best results and check how many solutions are within 1e-6 of best
+        #select best results and check how many solutions are within 1e-6 of best
         #not sure what leastsq returns
         return results
 
@@ -255,17 +258,17 @@ class NonlinearLS(Model):  #or subclass a model
 class Myfunc(NonlinearLS):
 
     #predict model.Model has a different signature
-##    def predict(self, params, exog=None):
-##        if not exog is None:
-##            x = exog
-##        else:
-##            x = self.exog
-##        a, b, c = params
-##        return a*np.exp(-b*x) + c
+    #def predict(self, params, exog=None):
+    #    if not exog is None:
+    #        x = exog
+    #    else:
+    #        x = self.exog
+    #    a, b, c = params
+    #    return a*np.exp(-b*x) + c
 
     def _predict(self, params):
         x = self.exog
-        a, b, c = params
+        (a, b, c) = params
         return a*np.exp(-b*x) + c
 
 
@@ -277,7 +280,7 @@ if __name__ == '__main__':
         return a*np.exp(-b*x) + c
 
     def func(params, x):
-        a, b, c = params
+        (a, b, c) = params
         return a*np.exp(-b*x) + c
 
     def error(params, x, y):
@@ -289,13 +292,13 @@ if __name__ == '__main__':
 
 
 
-    x = np.linspace(0,4,50)
+    x = np.linspace(0, 4, 50)
     params = np.array([2.5, 1.3, 0.5])
     y0 = func(params, x)
     y = y0 + 0.2*np.random.normal(size=len(x))
 
     res = optimize.leastsq(error, params, args=(x, y), full_output=True)
-##    r, R, c = getjaccov(res[1:], 3)
+    #r, R, c = getjaccov(res[1:], 3)
 
     mod = Myfunc(y, x)
     resmy = mod.fit(nparams=3)

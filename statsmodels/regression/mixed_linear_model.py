@@ -2100,7 +2100,10 @@ class MixedLMResults(base.LikelihoodModelResults, base.ResultMixin):
         super(MixedLMResults, self).__init__(model, params,
                                              normalized_cov_params=cov_params)
         self.nobs = self.model.nobs
-        self.df_resid = self.nobs - np_matrix_rank(self.model.exog)
+        rank = np_matrix_rank(self.model.exog) # TODO: Should we set rank attribute?
+        # TODO: is self.df_model defined?  If not, is `rank` an appropriate value?
+        self.df_resid = self.nobs - rank
+        # TODO: Is this different from what is set in super(...).__init__ ?
 
 
     @cache_readonly

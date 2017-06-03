@@ -435,10 +435,13 @@ class OneWayMixed(object):
             t += L.pinv(np.dot(unit.Z.T, unit.Z))
 
         #TODO: JP added df_resid check
-        self.df_resid = (self.N - (self.m - 1) * self.q - self.p)
-        sigmasq /= (self.N - (self.m - 1) * self.q - self.p)
+        # TODO: Move away from 1-letter names
+        df_model_analogue = (self.n_units - 1) * self.k_exog_re + self.k_exog_fe
+        # TODO: Is this actually the df_model?
+        self.df_resid = self.nobs - df_model_analogue
+        sigmasq /= self.df_resid
         self.sigma = np.sqrt(sigmasq)
-        self.D = (D - sigmasq * t) / self.m
+        self.D = (D - sigmasq * t) / self.n_units
 
     def cont(self, ML=False, rtol=1.0e-05, params_rtol=1e-5, params_atol=1e-4):
         '''convergence check for iterative estimation

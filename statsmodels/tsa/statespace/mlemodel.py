@@ -1556,6 +1556,7 @@ class MLEResults(tsbase.TimeSeriesModelResults):
         # Degrees of freedom
         self.df_model = self.params.size
         self.df_resid = self.nobs_effective - self.df_model
+        # TODO: nobs_effective isn't outside mlemodel.  Normalize naming conventions.  See #3689
 
         # Setup covariance matrix notes dictionary
         if not hasattr(self, 'cov_kwds'):

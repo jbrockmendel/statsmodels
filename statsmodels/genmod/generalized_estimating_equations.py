@@ -592,9 +592,10 @@ class GEE(base.Model):
         # Total sample size
         group_ns = [len(y) for y in self.endog_li]
         self.nobs = sum(group_ns)
+        k_exog = self.exog.shape[1] # TODO: set k_exog attribute?
         # The following are column based, not on rank see #1928
-        self.df_model = self.exog.shape[1] - 1  # assumes constant
-        self.df_resid = self.nobs - self.exog.shape[1]
+        self.df_model = k_exog - 1  # assumes constant
+        self.df_resid = self.nobs - (self.df_model + 1)
 
         # Skip the covariance updates if all groups have a single
         # observation (reduces to fitting a GLM).
