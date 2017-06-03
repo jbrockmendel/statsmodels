@@ -1,4 +1,6 @@
 from __future__ import print_function
+import warnings
+
 from statsmodels.compat.python import iterkeys, lzip, range, reduce
 import numpy as np
 from scipy import stats
@@ -233,7 +235,7 @@ class LikelihoodModel(Model):
         """
         Score vector of model.
 
-        The gradient of logL with respect to each parameter.
+        The gradient of loglike with respect to each parameter.
         """
         raise NotImplementedError
 
@@ -427,7 +429,7 @@ class LikelihoodModel(Model):
                 start_params = [0] * self.exog.shape[1]
             else:
                 raise ValueError("If exog is None, then start_params should "
-                                 "be specified")
+                                "be specified")
 
         # TODO: separate args from nonarg taking score and hessian, ie.,
         # user-supplied and numerically evaluated estimate frprime doesn't take
@@ -476,8 +478,7 @@ class LikelihoodModel(Model):
                 Hinv = eigvecs.dot(np.diag(1.0 / eigvals)).dot(eigvecs.T)
                 Hinv = np.asfortranarray((Hinv + Hinv.T) / 2.0)
             else:
-                from warnings import warn
-                warn('Inverting hessian failed, no bse or cov_params '
+                warnings.warn('Inverting hessian failed, no bse or cov_params '
                      'available', HessianInversionWarning)
                 Hinv = None
 
@@ -488,6 +489,8 @@ class LikelihoodModel(Model):
             kwds = {}
         if 'use_t' in kwargs:
             kwds['use_t'] = kwargs['use_t']
+        if 'k_constr' in kwargs:
+            kwds['k_constr'] = kwargs['k_constr']
         #prints for debugging
         #print('kwargs inLikelihoodModel.fit', kwargs)
         #print('kwds inLikelihoodModel.fit', kwds)
@@ -498,9 +501,8 @@ class LikelihoodModel(Model):
         if isinstance(retvals, dict):
             mlefit.mle_retvals = retvals
             if warn_convergence and not retvals['converged']:
-                from warnings import warn
                 from statsmodels.tools.sm_exceptions import ConvergenceWarning
-                warn("Maximum Likelihood optimization failed to converge. "
+                warnings.warn("Maximum Likelihood optimization failed to converge. "
                      "Check mle_retvals", ConvergenceWarning)
 
         mlefit.mle_settings = optim_settings
@@ -607,10 +609,11 @@ class GenericLikelihoodModel(LikelihoodModel):
         #statsmodels.model.LikelihoodModel.__init__
         #and should contain any preprocessing that needs to be done for a model
         if self.exog is not None:
+            rank = float(np_matrix_rank(self.exog)) # TODO: Should we set rank attribute?
+            nobs = self.exog.shape[0] # TODO: Should we set nobs attribute here?
             # assume constant
-            er = np_matrix_rank(self.exog)
-            self.df_model = float(er - 1)
-            self.df_resid = float(self.exog.shape[0] - er)
+            self.df_model = rank - 1
+            self.df_resid = nobs - (self.df_model + 1)
         else:
             self.df_model = np.nan
             self.df_resid = np.nan
@@ -738,7 +741,6 @@ class GenericLikelihoodModel(LikelihoodModel):
                                          ['par%d' % i for i in range(-k_miss)])
             else:
                 # I don't want to raise after we have already fit()
-                import warnings
                 warnings.warn('more exog_names than parameters', ValueWarning)
 
         return genericmlefit
@@ -764,6 +766,7 @@ class Results(object):
     def initialize(self, model, params, **kwd):
         self.params = params
         self.model = model
+        # TODO: why not just unconditionally set self.k_constant = getattr(model, 'k_constant', 0)?
         if hasattr(model, 'k_constant'):
             self.k_constant = model.k_constant
 
@@ -808,7 +811,6 @@ class Results(object):
                 if exog_index is not None:
                     exog = exog.reindex(exog_index)
                 else:
-                    import warnings
                     warnings.warn("nan rows have been dropped", ValueWarning)
 
         if exog is not None:
@@ -848,7 +850,7 @@ class LikelihoodModelResults(Results):
     params : 1d array_like
         parameter estimates from estimated model
     normalized_cov_params : 2d array
-       Normalized (before scaling) covariance of params. (dot(X.T,X))**-1
+        Normalized (before scaling) covariance of params. (dot(X.T,X))**-1
     scale : float
         For (some subset of models) scale will typically be the
         mean square error from the estimated model (sigma^2)
@@ -1002,6 +1004,9 @@ class LikelihoodModelResults(Results):
         super(LikelihoodModelResults, self).__init__(model, params)
         self.normalized_cov_params = normalized_cov_params
         self.scale = scale
+
+        if 'k_constr' in kwargs:
+            self.k_constr = kwargs['k_constr']
 
         # robust covariance
         # We put cov_type in kwargs so subclasses can decide in fit whether to
@@ -1174,8 +1179,7 @@ class LikelihoodModelResults(Results):
             return cov_p
 
     #TODO: make sure this works as needed for GLMs
-    def t_test(self, r_matrix, cov_p=None, scale=None,
-               use_t=None):
+    def t_test(self, r_matrix, cov_p=None, scale=None, use_t=None):
         """
         Compute a t-test for a each linear hypothesis of the form Rb = q
 
@@ -1967,7 +1971,7 @@ class ResultMixin(object):
         """
         results = []
         print(self.model.__class__)
-        hascloneattr = True if hasattr(self, 'cloneattr') else False
+        hascloneattr = hasattr(self, 'cloneattr')
         for i in range(nrep):
             rvsind = np.random.randint(self.nobs, size=self.nobs)
             #this needs to set startparam and get other defining attributes
@@ -2043,30 +2047,19 @@ class GenericLikelihoodModelResults(LikelihoodModelResults, ResultMixin):
 
     """
 
+    # TODO: Remind me why we are passing mlefit when this is a subclass of LikelihoodModelResults?
     def __init__(self, model, mlefit):
         self.model = model
         self.endog = model.endog
         self.exog = model.exog
         self.nobs = model.endog.shape[0]
 
-        # TODO: possibly move to model.fit()
-        #       and outsource together with patching names
-        if hasattr(model, 'df_model'):
-            self.df_model = model.df_model
-        else:
-            self.df_model = len(mlefit.params)
-            # retrofitting the model, used in t_test TODO: check design
-            self.model.df_model = self.df_model
-
-        if hasattr(model, 'df_resid'):
-            self.df_resid = model.df_resid
-        else:
-            self.df_resid = self.endog.shape[0] - self.df_model
-            # retrofitting the model, used in t_test TODO: check design
-            self.model.df_resid = self.df_resid
+        _inherit_freedom(self, model, mlefit)
 
         self._cache = resettable_cache()
         self.__dict__.update(mlefit.__dict__)
+        # TODO: Since we are subclassing LikelihoodModelResults, why not just
+        # call super(...).__init__ and avoid this namespace-defiling __dict__.update? 
 
     def summary(self, yname=None, xname=None, title=None, alpha=.05):
         """Summarize the Regression Results
@@ -2127,3 +2120,33 @@ class GenericLikelihoodModelResults(LikelihoodModelResults, ResultMixin):
                               use_t=False)
 
         return smry
+
+
+
+# TODO: I don't like passing instances like this...
+def _inherit_freedom(results, model, mlefit):#, kwargs):
+    # k_constr = kwargs.get('k_constr', 0)
+    k_constr = getattr(mlefit, 'k_constr', 0)
+    # TODO: Move away from passing mlefit, towards the kwargs.get method instead
+
+
+    # TODO: possibly move to model.fit()
+    #       and outsource together with patching names
+    # TODO x 2: No!  Don't patch names *after* calling `fit`.  Set them in __init__!
+    if hasattr(model, 'df_model'):
+        results.df_model = model.df_model - k_constr
+    else:
+        results.df_model = len(mlefit.params) - k_constr
+        # retrofitting the model, used in t_test TODO: check design
+        # TODO: warnings.warn(RuntimeWarning("Don't modify results.model.df_model, buddy.", len(mlefit.params)))
+        results.model.df_model = results.df_model
+
+    if hasattr(model, 'df_resid'):
+        results.df_resid = model.df_resid + k_constr
+    else:
+        results.df_resid = results.nobs - results.df_model
+        # retrofitting the model, used in t_test TODO: check design
+        # TODO: warnings.warn(RuntimeWarning("Don't modify results.model.df_resid, buddy.", results.nobs, results.df_model))
+        results.model.df_resid = results.df_resid
+
+    return
