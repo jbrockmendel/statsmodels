@@ -37,11 +37,11 @@ import statsmodels.base.wrapper as wrap
 
 def ma_rep(coefs, maxn=10):
     r"""
-    MA(\infty) representation of VAR(p) process
+    MA(\infty) representation of VAR(k_ar) process
 
     Parameters
     ----------
-    coefs : ndarray (p x k x k)
+    coefs : ndarray (k_ar x neqs x neqs)
     maxn : int
         Number of MA matrices to compute
 
@@ -61,14 +61,14 @@ def ma_rep(coefs, maxn=10):
     -------
     phis : ndarray (maxn + 1 x k x k)
     """
-    p, k, k = coefs.shape
-    phis = np.zeros((maxn+1, k, k))
-    phis[0] = np.eye(k)
+    k_ar, neqs, _ = coefs.shape
+    phis = np.zeros((maxn+1, neqs, neqs))
+    phis[0] = np.eye(neqs)
 
     # recursively compute Phi matrices
     for i in range(1, maxn + 1):
         for j in range(1, i+1):
-            if j > p:
+            if j > k_ar:
                 break
 
             phis[i] += np.dot(phis[i-j], coefs[j-1])
@@ -105,12 +105,12 @@ def var_acf(coefs, sig_u, nlags=None):
 
     Parameters
     ----------
-    coefs : ndarray (p x k x k)
+    coefs : ndarray (k_ar x neqs x neqs)
         Coefficient matrices A_i
-    sig_u : ndarray (k x k)
+    sig_u : ndarray (neqs x neqs)
         Covariance of white noise process u_t
     nlags : int, optional
-        Defaults to order p of system
+        Defaults to order k_ar of system
 
     Notes
     -----
@@ -118,22 +118,22 @@ def var_acf(coefs, sig_u, nlags=None):
 
     Returns
     -------
-    acf : ndarray, (p, k, k)
+    acf : ndarray, (k_ar, neqs, neqs)
     """
-    p, k, _ = coefs.shape
+    k_ar, neqs, _ = coefs.shape
     if nlags is None:
-        nlags = p
+        nlags = k_ar
 
-    # p x k x k, ACF for lags 0, ..., p-1
-    result = np.zeros((nlags + 1, k, k))
-    result[:p] = _var_acf(coefs, sig_u)
+    # k_ar x neqs x neqs, ACF for lags 0, ..., k_ar-1
+    result = np.zeros((nlags + 1, neqs, neqs))
+    result[:k_ar] = _var_acf(coefs, sig_u)
 
     # yule-walker equations
-    for h in range(p, nlags + 1):
+    for h in range(k_ar, nlags + 1):
         # compute ACF for lag=h
-        # G(h) = A_1 G(h-1) + ... + A_p G(h-p)
+        # G(h) = A_1 G(h-1) + ... + A_p G(h-k_ar)
 
-        for j in range(p):
+        for j in range(k_ar):
             result[h] += np.dot(coefs[j], result[h-j-1])
 
     return result
@@ -146,19 +146,19 @@ def _var_acf(coefs, sig_u):
     -----
     Lutkepohl (2005) p.29
     """
-    p, k, k2 = coefs.shape
-    assert(k == k2)
+    k_ar, neqs, neqs2 = coefs.shape
+    assert(neqs == neqs2)
 
     A = util.comp_matrix(coefs)
     # construct VAR(1) noise covariance
-    SigU = np.zeros((k*p, k*p))
-    SigU[:k,:k] = sig_u
+    SigU = np.zeros((neqs*k_ar, neqs*k_ar))
+    SigU[:neqs, :neqs] = sig_u
 
     # vec(ACF) = (I_(kp)^2 - kron(A, A))^-1 vec(Sigma_U)
-    vecACF = scipy.linalg.solve(np.eye((k*p)**2) - np.kron(A, A), vec(SigU))
+    vecACF = scipy.linalg.solve(np.eye((neqs*k_ar)**2) - np.kron(A, A), vec(SigU))
 
     acf = unvec(vecACF)
-    acf = acf[:k].T.reshape((p, k, k))
+    acf = acf[:neqs].T.reshape((k_ar, neqs, neqs))
 
     return acf
 
@@ -188,8 +188,11 @@ def mse(ma_coefs, sigma_u, steps):
         phi = ma_coefs[h]
         var = chain_dot(phi, sigma_u, phi.T)
         forc_covs[h] = prior = prior + var
+        # TODO: Is setting `prior` here intentional?
 
     return forc_covs
+
+forecast_cov = mse
 
 def forecast(y, coefs, trend_coefs, steps, exog=None):
     """
@@ -213,10 +216,10 @@ def forecast(y, coefs, trend_coefs, steps, exog=None):
 
     Also used by DynamicVAR class
     """
-    p = len(coefs)
-    k = len(coefs[0])
+    k_ar = len(coefs)
+    neqs = len(coefs[0])
     # initial value
-    forcs = np.zeros((steps, k))
+    forcs = np.zeros((steps, neqs))
     if exog is not None and trend_coefs is not None:
         forcs += np.dot(exog, trend_coefs)
     # to make existing code (with trend_coefs=intercept and without exog) work:
@@ -230,7 +233,7 @@ def forecast(y, coefs, trend_coefs, steps, exog=None):
     for h in range(1, steps + 1):
         # y_t(h) = intercept + sum_1^p A_i y_t_(h-i)
         f = forcs[h - 1]
-        for i in range(1, p + 1):
+        for i in range(1, k_ar + 1):
             # slightly hackish
             if h - i <= 0:
                 # e.g. when h=1, h-1 = 0, which is y[-1]
@@ -245,30 +248,6 @@ def forecast(y, coefs, trend_coefs, steps, exog=None):
         forcs[h - 1] = f
 
     return forcs
-
-
-def forecast_cov(ma_coefs, sig_u, steps):
-    """
-    Compute theoretical forecast error variance matrices
-
-    Parameters
-    ----------
-
-    Returns
-    -------
-    forc_covs : ndarray (steps x neqs x neqs)
-    """
-    k = len(sig_u)
-    forc_covs = np.zeros((steps, k, k))
-
-    prior = np.zeros((k, k))
-    for h in range(steps):
-        # Sigma(h) = Sigma(h-1) + Phi Sig_u Phi'
-        phi = ma_coefs[h]
-        var = chain_dot(phi, sig_u, phi.T)
-        forc_covs[h] = prior = prior + var
-
-    return forc_covs
 
 
 def _forecast_vars(steps, ma_coefs, sig_u):
@@ -344,37 +323,40 @@ def var_loglike(resid, omega, nobs):
 
 
 def _reordered(self, order):
-    #Create new arrays to hold rearranged results from .fit()
+    # Create new arrays to hold rearranged results from .fit()
     endog = self.endog
     endog_lagged = self.endog_lagged
     params = self.params
     sigma_u = self.sigma_u
     names = self.names
     k_ar = self.k_ar
-    endog_new = np.zeros([np.size(endog,0),np.size(endog,1)])
-    endog_lagged_new = np.zeros([np.size(endog_lagged,0), np.size(endog_lagged,1)])
-    params_new_inc, params_new = [np.zeros([np.size(params,0), np.size(params,1)])
+    k_trend = self.k_trend
+
+    endog_new = np.zeros([np.size(endog, 0), np.size(endog, 1)])
+    endog_lagged_new = np.zeros([np.size(endog_lagged, 0), np.size(endog_lagged, 1)])
+    params_new_inc, params_new = [np.zeros([np.size(params, 0), np.size(params, 1)])
                                   for i in range(2)]
-    sigma_u_new_inc, sigma_u_new = [np.zeros([np.size(sigma_u,0), np.size(sigma_u,1)])
+    sigma_u_new_inc, sigma_u_new = [np.zeros([np.size(sigma_u, 0), np.size(sigma_u, 1)])
                                     for i in range(2)]
     num_end = len(self.params[0])
     names_new = []
 
-    #Rearrange elements and fill in new arrays
-    k = self.k_trend
-    for i, c in enumerate(order):
-        endog_new[:,i] = self.endog[:,c]
-        if k > 0:
-            params_new_inc[0,i] = params[0,i]
-            endog_lagged_new[:,0] = endog_lagged[:,0]
+    # Rearrange elements and fill in new arrays
+    for (i, c) in enumerate(order):
+        endog_new[:, i] = self.endog[:, c]
+        if k_trend > 0:
+            params_new_inc[0, i] = params[0, i]
+            endog_lagged_new[:, 0] = endog_lagged[:, 0]
         for j in range(k_ar):
-            params_new_inc[i+j*num_end+k,:] = self.params[c+j*num_end+k,:]
-            endog_lagged_new[:,i+j*num_end+k] = endog_lagged[:,c+j*num_end+k]
-        sigma_u_new_inc[i,:] = sigma_u[c,:]
+            params_new_inc[i+j*num_end+k_trend, :] = self.params[c+j*num_end+k_trend, :]
+            endog_lagged_new[:, i+j*num_end+k_trend] = endog_lagged[:, c+j*num_end+k_trend]
+
+        sigma_u_new_inc[i, :] = sigma_u[c, :]
         names_new.append(names[c])
-    for i, c in enumerate(order):
-        params_new[:,i] = params_new_inc[:,c]
-        sigma_u_new[:,i] = sigma_u_new_inc[:,c]
+
+    for (i, c) in enumerate(order):
+        params_new[:, i] = params_new_inc[:, c]
+        sigma_u_new[:, i] = sigma_u_new_inc[:, c]
 
     return VARResults(endog=endog_new, endog_lagged=endog_lagged_new,
                       params=params_new, sigma_u=sigma_u_new,
@@ -423,7 +405,7 @@ def test_normality(results, signif=0.05):
     Returns
     -------
     result : NormalityTestResults
-        
+
     References
     ----------
     .. [1] Lutkepohl, H. 2005. *New Introduction to Multiple Time Series Analysis*. Springer.
@@ -500,7 +482,7 @@ class LagOrderResults:
                    + ", FPE -> " + str(self.fpe) \
                    + ", HQIC -> " + str(self.hqic) + ">"
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # VARProcess class: for known or unknown VAR process
 
 class VAR(tsbase.TimeSeriesModel):
@@ -522,12 +504,12 @@ class VAR(tsbase.TimeSeriesModel):
     ----------
     Lutkepohl (2005) New Introduction to Multiple Time Series Analysis
     """
-    def __init__(self, endog, exog=None, dates=None, freq=None,
-                 missing='none'):
+    def __init__(self, endog, exog=None, dates=None, freq=None, missing='none'):
         super(VAR, self).__init__(endog, exog, dates, freq, missing=missing)
         if self.endog.ndim == 1:
             raise ValueError("Only gave one variable to VAR")
-        self.y = self.endog #keep alias for now
+        self.y = self.endog # keep alias for now
+        # TODO: Get rid of self.y
         self.neqs = self.endog.shape[1]
         self.n_totobs = len(endog)
 
@@ -557,7 +539,7 @@ class VAR(tsbase.TimeSeriesModel):
             intercept = params[:k_trend]
             predictedvalues += intercept
 
-        y = self.y
+        y = self.endog
         X = util.get_var_endog(y, lags, trend=trend, has_constant='raise')
         fittedvalues = np.dot(X, params)
 
@@ -571,7 +553,7 @@ class VAR(tsbase.TimeSeriesModel):
 
         # fit out of sample
         y = y[-k_ar:]
-        coefs = params[k_trend:].reshape((k_ar, k, k)).swapaxes(1,2)
+        coefs = params[k_trend:].reshape((k_ar, k, k)).swapaxes(1, 2)
         predictedvalues[pv_end:] = forecast(y, coefs, intercept, out_of_sample)
         return predictedvalues
 
@@ -629,7 +611,7 @@ class VAR(tsbase.TimeSeriesModel):
             lags = getattr(selections, ic)
             if verbose:
                 print(selections)
-                print('Using %d based on %s criterion' %  (lags, ic))
+                print('Using %d based on %s criterion' % (lags, ic))
         else:
             if lags is None:
                 lags = 1
@@ -661,15 +643,18 @@ class VAR(tsbase.TimeSeriesModel):
         """
         # have to do this again because select_order doesn't call fit
         self.k_trend = k_trend = util.get_trendorder(trend)
+        # TODO: Can we avoid setting `self.k_trend` here?
 
-        if offset < 0: # pragma: no cover
+        if offset < 0:  # pragma: no cover
             raise ValueError('offset must be >= 0')
 
         nobs = self.n_totobs - lags - offset
         endog = self.endog[offset:]
-        exog = None if self.exog is None else self.exog[offset:]
-        z = util.get_var_endog(endog, lags, trend=trend,
-                               has_constant='raise')
+        exog = self.exog
+        if exog is not None:
+            exog = exog[offset:]
+
+        z = util.get_var_endog(endog, lags, trend=trend, has_constant='raise')
         if exog is not None:
             # todo: currently only deterministic terms supported (exoglags==0)
             # and since exoglags==0, x will be an array of size 0.
@@ -684,6 +669,7 @@ class VAR(tsbase.TimeSeriesModel):
             z[:, self.k_trend:self.k_trend+x.shape[1]] = x
             z[:, self.k_trend+x.shape[1]:] = temp_z[:, self.k_trend:]
             del temp_z, x  # free memory
+
         # the following modification of z is necessary to get the same results
         # as JMulTi for the constant-term-parameter...
         for i in range(self.k_trend):
@@ -740,6 +726,9 @@ class VAR(tsbase.TimeSeriesModel):
         """
         if maxlags is None:
             maxlags = int(round(12*(len(self.endog)/100.)**(1/4.)))
+            # TODO: This shows up in a number of places.  Standardize it.
+            # Also, in some places it starts with `int` and others with
+            # `np.ceil`.  Sort that out.
 
         ics = defaultdict(list)
         p_min = 0 if self.exog is not None or trend != "nc" else 1
@@ -751,8 +740,7 @@ class VAR(tsbase.TimeSeriesModel):
             for k, v in iteritems(result.info_criteria):
                 ics[k].append(v)
 
-        selected_orders = dict((k, np.array(v).argmin() + p_min)
-                               for k, v in iteritems(ics))
+        selected_orders = {k: np.array(ics[k]).argmin() + p_min for k in ics}
 
         return LagOrderResults(ics, selected_orders, vecm=False)
 
@@ -938,6 +926,7 @@ class VARProcess(object):
             exog_future = np.column_stack(exogs)
         return forecast(y, self.coefs, trend_coefs, steps, exog_future)
 
+    # TODO: Redundancy with `mse` module-level functions
     def mse(self, steps):
         """
         Compute theoretical forecast error variance matrices
@@ -966,6 +955,7 @@ class VARProcess(object):
             phi = ma_coefs[h]
             var = chain_dot(phi, self.sigma_u, phi.T)
             forc_covs[h] = prior = prior + var
+            # TODO: Is setting `prior` here intentional?
 
         return forc_covs
 
@@ -1093,11 +1083,12 @@ class VARResults(VARProcess):
                  model=None, trend='c', names=None, dates=None, exog=None):
 
         self.model = model
-        self.y = self.endog = endog  #keep alias for now
-        self.ys_lagged = self.endog_lagged = endog_lagged #keep alias for now
+        self.y = self.endog = endog  # keep alias for now
+        self.ys_lagged = self.endog_lagged = endog_lagged # keep alias for now
+        # TODO: "for now" has been long enough.  Deprecate self.y, self.ys_lagged
         self.dates = dates
 
-        self.n_totobs, neqs = self.y.shape
+        self.n_totobs, neqs = self.endog.shape
         self.nobs = self.n_totobs - lag_order
         self.trend = trend
         k_trend = util.get_trendorder(trend)
@@ -1126,7 +1117,7 @@ class VARResults(VARProcess):
     def plot(self):
         """Plot input time series
         """
-        plotting.plot_mts(self.y, names=self.names, index=self.dates)
+        plotting.plot_mts(self.endog, names=self.names, index=self.dates)
 
     @property
     def df_model(self):
@@ -1143,16 +1134,16 @@ class VARResults(VARProcess):
     def fittedvalues(self):
         """The predicted insample values of the response variables of the model.
         """
-        return np.dot(self.ys_lagged, self.params)
+        return np.dot(self.endog_lagged, self.params)
 
     @cache_readonly
     def resid(self):
         """Residuals of response variable resulting from estimated coefficients
         """
-        return self.y[self.k_ar:] - self.fittedvalues
+        return self.endog[self.k_ar:] - self.fittedvalues
 
     def sample_acov(self, nlags=1):
-        return _compute_acov(self.y[self.k_ar:], nlags=nlags)
+        return _compute_acov(self.endog[self.k_ar:], nlags=nlags)
 
     def sample_acorr(self, nlags=1):
         acovs = self.sample_acov(nlags=nlags)
@@ -1213,8 +1204,7 @@ class VARResults(VARProcess):
         Adjusted to be an unbiased estimator
         Ref: Lutkepohl p.74-75
         """
-        z = self.ys_lagged
-        return np.kron(scipy.linalg.inv(np.dot(z.T, z)), self.sigma_u)
+        return np.kron(scipy.linalg.inv(self._zz), self.sigma_u)
 
     def cov_ybar(self):
         r"""Asymptotically consistent estimate of covariance of the sample mean
@@ -1234,13 +1224,13 @@ class VARResults(VARProcess):
         Ainv = scipy.linalg.inv(np.eye(self.neqs) - self.coefs.sum(0))
         return chain_dot(Ainv, self.sigma_u, Ainv.T)
 
-#------------------------------------------------------------
-# Estimation-related things
+    # ------------------------------------------------------------
+    # Estimation-related things
 
     @cache_readonly
     def _zz(self):
         # Z'Z
-        return np.dot(self.ys_lagged.T, self.ys_lagged)
+        return np.dot(self.endog_lagged.T, self.endog_lagged)
 
     @property
     def _cov_alpha(self):
@@ -1272,6 +1262,7 @@ class VARResults(VARProcess):
         """
         stderr = np.sqrt(np.diag(self.cov_params))
         return stderr.reshape((self.df_model, self.neqs), order='C')
+        # TODO: is the order='C' necessary?  Couldn't hurt, but still
 
     bse = stderr  # statsmodels interface?
 
@@ -1318,14 +1309,15 @@ class VARResults(VARProcess):
     def pvalues_dt(self):
         end = self.k_trend
         return self.pvalues[:end]
-# todo: ----------------------------------------------------------------------------------------------------------,
+
+    # todo: ----------------------------------------------------------------------------------------------------------,
     def plot_forecast(self, steps, alpha=0.05, plot_stderr=True):
         """
         Plot forecast
         """
-        mid, lower, upper = self.forecast_interval(self.y[-self.k_ar:], steps,
+        mid, lower, upper = self.forecast_interval(self.endog[-self.k_ar:], steps,
                                                    alpha=alpha)
-        plotting.plot_var_forc(self.y, mid, lower, upper, names=self.names,
+        plotting.plot_var_forc(self.endog, mid, lower, upper, names=self.names,
                                plot_stderr=plot_stderr)
 
     # Forecast error covariance functions
@@ -1396,26 +1388,34 @@ class VARResults(VARProcess):
         ma_coll = np.zeros((repl, T+1, neqs, neqs))
 
         def fill_coll(sim):
+            # TODO: de-duplicate this function with equiv in `irf_resim`
             ret = VAR(sim, exog=self.exog).fit(maxlags=k_ar, trend=self.trend)
-            ret = ret.orth_ma_rep(maxn=T) if orth else ret.ma_rep(maxn=T)
-            return ret.cumsum(axis=0) if cum else ret
+            if orth:
+                ret = ret.orth_ma_rep(maxn=T)
+            else:
+                ret = ret.ma_rep(maxn=T)
+            if cum:
+                ret = ret.cumsum(axis=0)
+            return ret
 
         for i in range(repl):
             #discard first hundred to eliminate correct for starting bias
             sim = util.varsim(coefs, intercept, sigma_u,
                               seed=seed, steps=nobs+burn)
             sim = sim[burn:]
-            ma_coll[i,:,:,:] = fill_coll(sim)
+            ma_coll[i, :, :, :] = fill_coll(sim)
 
-        ma_sort = np.sort(ma_coll, axis=0) #sort to get quantiles
-        index = round(signif/2*repl)-1,round((1-signif/2)*repl)-1
-        lower = ma_sort[index[0],:, :, :]
-        upper = ma_sort[index[1],:, :, :]
-        return lower, upper
+        ma_sort = np.sort(ma_coll, axis=0) # sort to get quantiles
+        index = (int(round(signif/2*repl)-1), int(round((1-signif/2)*repl)-1))
+        # TODO: This needs at least a smoke-test.  Without the just-added
+        # explicit casting to `int`, trying to access ma_sort[index[0]]
+        # below would raise a TypeError.
+        lower = ma_sort[index[0], :, :, :]
+        upper = ma_sort[index[1], :, :, :]
+        return (lower, upper)
 
     def irf_resim(self, orth=False, repl=1000, T=10,
                       seed=None, burn=100, cum=False):
-
         """
         Simulates impulse response function, returning an array of simulations.
         Used for Sims-Zha error band calculation.
@@ -1459,15 +1459,21 @@ class VARResults(VARProcess):
 
         def fill_coll(sim):
             ret = VAR(sim, exog=self.exog).fit(maxlags=k_ar, trend=self.trend)
-            ret = ret.orth_ma_rep(maxn=T) if orth else ret.ma_rep(maxn=T)
-            return ret.cumsum(axis=0) if cum else ret
+            if orth:
+                ret = ret.orth_ma_rep(maxn=T)
+            else:
+                ret = ret.ma_rep(maxn=T)
+            if cum:
+                ret = ret.cumsum(axis=0)
+            return ret
+
 
         for i in range(repl):
-            #discard first hundred to eliminate correct for starting bias
+            # discard first hundred to eliminate correct for starting bias
             sim = util.varsim(coefs, intercept, sigma_u,
                               seed=seed, steps=nobs+burn)
             sim = sim[burn:]
-            ma_coll[i,:,:,:] = fill_coll(sim)
+            ma_coll[i, :, :, :] = fill_coll(sim)
 
         return ma_coll
 
@@ -1479,6 +1485,8 @@ class VARResults(VARProcess):
 
         # memoize powers of B for speedup
         # TODO: see if can memoize better
+        # TODO: memoizing `bpow` is much less useful than caching
+        # the results of `np.trace` and `chain_dot` below.
         B = self._bmat_forc_cov()
         _B = {}
         def bpow(i):
@@ -1563,18 +1571,20 @@ class VARResults(VARProcess):
     def reorder(self, order):
         """Reorder variables for structural specification
         """
-        if len(order) != len(self.params[0,:]):
-            raise ValueError("Reorder specification length should match number of endogenous variables")
-       #This convert order to list of integers if given as strings
+        if len(order) != len(self.params[0, :]):
+            raise ValueError("Reorder specification length should match number "
+                             "of endogenous variables")
+
         if isinstance(order[0], string_types):
+            # This convert order to list of integers if given as strings
             order_new = []
-            for i, nam in enumerate(order):
+            for (i, nam) in enumerate(order):
                 order_new.append(self.names.index(order[i]))
             order = order_new
         return _reordered(self, order)
 
-#-------------------------------------------------------------------------------
-# VAR Diagnostics: Granger-causality, whiteness of residuals, normality, etc.
+    # --------------------------------------------------------------------------
+    # VAR Diagnostics: Granger-causality, whiteness of residuals, normality, etc
 
     def test_causality(self, caused, causing=None, kind='f', signif=0.05):
         """
@@ -1636,7 +1646,6 @@ class VARResults(VARProcess):
         caused_ind = [util.get_index(self.names, c) for c in caused]
 
         if causing is not None:
-
             if isinstance(causing, allowed_types):
                 causing = [causing]
             if not all(isinstance(c, allowed_types) for c in causing):
@@ -1649,20 +1658,21 @@ class VARResults(VARProcess):
             causing_ind = [i for i in range(self.neqs) if i not in caused_ind]
             causing = [self.names[c] for c in caused_ind]
 
-        k, p = self.neqs, self.k_ar
+        neqs = self.neqs
+        k_ar = self.k_ar
 
         # number of restrictions
-        num_restr = len(causing) * len(caused) * p
+        num_restr = len(causing) * len(caused) * k_ar
         num_det_terms = self.k_trend
 
         # Make restriction matrix
-        C = np.zeros((num_restr, k * num_det_terms + k**2 * p), dtype=float)
-        cols_det = k * num_det_terms
+        C = np.zeros((num_restr, neqs * num_det_terms + neqs**2 * k_ar), dtype=float)
+        cols_det = neqs * num_det_terms
         row = 0
-        for j in range(p):
+        for j in range(k_ar):
             for ing_ind in causing_ind:
                 for ed_ind in caused_ind:
-                    C[row, cols_det + ed_ind + k * ing_ind + k**2 * j] = 1
+                    C[row, cols_det + ed_ind + neqs * ing_ind + neqs**2 * j] = 1
                     row += 1
 
         # Lutkepohl 3.6.5
@@ -1677,7 +1687,7 @@ class VARResults(VARProcess):
             dist = stats.chi2(df)
         elif kind.lower() == 'f':
             statistic = lam_wald / num_restr
-            df = (num_restr, k * self.df_resid)
+            df = (num_restr, neqs * self.df_resid)
             dist = stats.f(*df)
         else:
             raise Exception('kind %s not recognized' % kind)
@@ -1749,7 +1759,7 @@ class VARResults(VARProcess):
         if isinstance(causing, allowed_types):
             causing = [causing]
         if not all(isinstance(c, allowed_types) for c in causing):
-            raise TypeError("causing has to be of type string or int (or a " +
+            raise TypeError("causing has to be of type string or int (or a "
                             "a sequence of these types).")
         causing = [self.names[c] if type(c) == int else c for c in causing]
         causing_ind = [util.get_index(self.names, c) for c in causing]
@@ -1758,7 +1768,8 @@ class VARResults(VARProcess):
         caused = [self.names[c] for c in caused_ind]
 
         # Note: JMulTi seems to be using k_ar+1 instead of k_ar
-        k, t, p = self.neqs, self.nobs, self.k_ar
+        neqs = self.neqs
+        nobs = self.nobs
 
         num_restr = len(causing) * len(caused)  # called N in Lutkepohl
 
@@ -1777,11 +1788,11 @@ class VARResults(VARProcess):
         for row in range(num_restr):
             C[row, inds[row]] = 1
         Cs = np.dot(C, vech_sigma_u)
-        d = np.linalg.pinv(duplication_matrix(k))
+        d = np.linalg.pinv(duplication_matrix(neqs))
         Cd = np.dot(C, d)
         middle = scipy.linalg.inv(chain_dot(Cd, np.kron(sigma_u, sigma_u), Cd.T)) / 2
 
-        wald_statistic = t * chain_dot(Cs.T, middle, Cs)
+        wald_statistic = nobs * chain_dot(Cs.T, middle, Cs)
         df = num_restr
         dist = stats.chi2(df)
 
@@ -1821,7 +1832,12 @@ class VARResults(VARProcess):
             if adjusted:
                 to_add /= (self.nobs - t)
             statistic += to_add
-        statistic *= self.nobs**2 if adjusted else self.nobs
+
+        if adjusted:
+            statistic *= self.nobs**2
+        else:
+            statistic *= self.nobs
+
         df = self.neqs**2 * (nlags - self.k_ar)
         dist = stats.chi2(df)
         pvalue = dist.sf(statistic)
@@ -1830,6 +1846,8 @@ class VARResults(VARProcess):
         return WhitenessTestResults(statistic, crit_value, pvalue, df, signif,
                                     nlags, adjusted)
 
+    # TODO: This is not a formal test.  Deprecate it in favor
+    # of `test_whiteness_new`?
     def test_whiteness(self, nlags=10, plot=True, linewidth=8):
         """
         Test white noise assumption. Sample (Y) autocorrelations are compared
@@ -1898,6 +1916,8 @@ class VARResults(VARProcess):
         neqs = self.neqs
         lag_order = self.k_ar
         free_params = lag_order * neqs ** 2 + neqs * self.k_trend
+        # Recall: df_model = k_ar * neqs + k_trend
+        # and df_resid = nobs - df_model
 
         ld = logdet_symm(self.sigma_u_mle)
 
@@ -1909,10 +1929,10 @@ class VARResults(VARProcess):
         fpe = ((nobs + self.df_model) / self.df_resid) ** neqs * np.exp(ld)
 
         return {
-            'aic' : aic,
-            'bic' : bic,
-            'hqic' : hqic,
-            'fpe' : fpe
+            'aic': aic,
+            'bic': bic,
+            'hqic': hqic,
+            'fpe': fpe
             }
 
     @property
@@ -1943,19 +1963,19 @@ class VARResults(VARProcess):
         neqs = self.neqs
         k_ar = self.k_ar
         p = neqs * k_ar
-        arr = np.zeros((p,p))
-        arr[:neqs,:] = np.column_stack(self.coefs)
-        arr[neqs:,:-neqs] = np.eye(p-neqs)
+        arr = np.zeros((p, p))
+        arr[:neqs, :] = np.column_stack(self.coefs)
+        arr[neqs:, :-neqs] = np.eye(p-neqs)
         roots = np.linalg.eig(arr)[0]**-1
         idx = np.argsort(np.abs(roots))[::-1] # sort by reverse modulus
         return roots[idx]
 
 class VARResultsWrapper(wrap.ResultsWrapper):
-    _attrs = {'bse' : 'columns_eq', 'cov_params' : 'cov',
-              'params' : 'columns_eq', 'pvalues' : 'columns_eq',
-              'tvalues' : 'columns_eq', 'sigma_u' : 'cov_eq',
-              'sigma_u_mle' : 'cov_eq',
-              'stderr' : 'columns_eq'}
+    _attrs = {'bse': 'columns_eq', 'cov_params': 'cov',
+              'params': 'columns_eq', 'pvalues': 'columns_eq',
+              'tvalues': 'columns_eq', 'sigma_u': 'cov_eq',
+              'sigma_u_mle': 'cov_eq',
+              'stderr': 'columns_eq'}
     _wrap_attrs = wrap.union_dicts(tsbase.TimeSeriesResultsWrapper._wrap_attrs,
                                     _attrs)
     _methods = {}
@@ -2014,7 +2034,7 @@ class FEVD(object):
         """
         raise NotImplementedError
 
-    def plot(self, periods=None, figsize=(10,10), **plot_kwds):
+    def plot(self, periods=None, figsize=(10, 10), **plot_kwds):
         """Plot graphical display of FEVD
 
         Parameters
@@ -2059,7 +2079,7 @@ class FEVD(object):
         fig.legend(handles, labels, loc='upper right')
         plotting.adjust_subplots(right=0.85)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 def _compute_acov(x, nlags=1):
     x = x - x.mean(0)
@@ -2080,9 +2100,7 @@ def _acovs_to_acorrs(acovs):
     return acovs / np.outer(sd, sd)
 
 if __name__ == '__main__':
-    import statsmodels.api as sm
-    from statsmodels.tsa.vector_ar.util import parse_lutkepohl_data, get_index, \
-        vech
+    from statsmodels.tsa.vector_ar.util import parse_lutkepohl_data
     import statsmodels.tools.data as data_util
 
     np.set_printoptions(linewidth=140, precision=5)
@@ -2127,4 +2145,3 @@ if __name__ == '__main__':
     est = model.fit(maxlags=2)
     irf = est.irf()
     '''
-
