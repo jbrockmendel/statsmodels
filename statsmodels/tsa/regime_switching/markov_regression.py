@@ -139,6 +139,11 @@ class MarkovRegression(markov_switching.MarkovSwitching):
         self.parameters['exog'] = self.switching_coeffs
         self.parameters['variance'] = [1] if self.switching_variance else [0]
 
+    @property
+    def _res_classes(self):
+        return {'fit': (MarkovRegressionResults,
+                        MarkovRegressionResultsWrapper)}
+
     def predict_conditional(self, params):
         """
         In-sample prediction, conditional on the current regime
@@ -190,20 +195,6 @@ class MarkovRegression(markov_switching.MarkovSwitching):
             np.exp(-0.5 * resid**2 / variance) / np.sqrt(2 * np.pi * variance))
 
         return conditional_likelihoods
-
-    def filter(self, *args, **kwargs):
-        kwargs.setdefault('results_class', MarkovRegressionResults)
-        kwargs.setdefault('results_wrapper_class',
-                          MarkovRegressionResultsWrapper)
-        return super(MarkovRegression, self).filter(*args, **kwargs)
-    filter.__doc__ = markov_switching.MarkovSwitching.filter.__doc__
-
-    def smooth(self, *args, **kwargs):
-        kwargs.setdefault('results_class', MarkovRegressionResults)
-        kwargs.setdefault('results_wrapper_class',
-                          MarkovRegressionResultsWrapper)
-        return super(MarkovRegression, self).smooth(*args, **kwargs)
-    smooth.__doc__ = markov_switching.MarkovSwitching.smooth.__doc__
 
     def _em_iteration(self, params0):
         """

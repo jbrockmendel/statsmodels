@@ -153,6 +153,11 @@ class MarkovAutoregression(markov_regression.MarkovRegression):
         # Cache an array for holding slices
         self._predict_slices = [slice(None, None, None)] * (self.order + 1)
 
+    @property
+    def _res_classes(self):
+        return {'fit': (MarkovAutoregressionResults,
+                        MarkovAutoregressionResultsWrapper)}
+
     def predict_conditional(self, params):
         """
         In-sample prediction, conditional on the current and previous regime
@@ -236,20 +241,6 @@ class MarkovAutoregression(markov_regression.MarkovRegression):
             np.exp(-0.5 * resid**2 / variance) / np.sqrt(2 * np.pi * variance))
 
         return conditional_likelihoods
-
-    def filter(self, *args, **kwargs):
-        kwargs.setdefault('results_class', MarkovAutoregressionResults)
-        kwargs.setdefault('results_wrapper_class',
-                          MarkovAutoregressionResultsWrapper)
-        return super(MarkovAutoregression, self).filter(*args, **kwargs)
-    filter.__doc__ = markov_regression.MarkovRegression.filter.__doc__
-
-    def smooth(self, *args, **kwargs):
-        kwargs.setdefault('results_class', MarkovAutoregressionResults)
-        kwargs.setdefault('results_wrapper_class',
-                          MarkovAutoregressionResultsWrapper)
-        return super(MarkovAutoregression, self).smooth(*args, **kwargs)
-    smooth.__doc__ = markov_regression.MarkovRegression.smooth.__doc__
 
     def _em_iteration(self, params0):
         """

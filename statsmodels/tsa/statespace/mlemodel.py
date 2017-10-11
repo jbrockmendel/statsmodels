@@ -523,8 +523,17 @@ class MLEModel(tsbase.TimeSeriesModel):
         # Get the state space output
         result = self.ssm.filter(complex_step=complex_step, **kwargs)
 
-        # Wrap in a results object
-        if not return_ssm:
+        result = self._wrap_results(result, params,
+                                    return_ssm, cov_type, cov_kwds)
+        return result
+
+    @property
+    def _res_classes(self):
+        return {'fit': (MLEResults, MLEResultsWrapper)}
+
+    def _wrap_results(self, result, params, return_raw, cov_type, cov_kwds):
+        if not return_raw:
+            # Wrap in a results object
             result_kwargs = {}
             if cov_type is not None:
                 result_kwargs['cov_type'] = cov_type
@@ -532,14 +541,13 @@ class MLEModel(tsbase.TimeSeriesModel):
                 result_kwargs['cov_kwds'] = cov_kwds
 
             if results_class is None:
-                results_class = MLEResults
+                results_class = self._res_classes['fit'][0]
             if results_wrapper_class is None:
-                results_wrapper_class = MLEResultsWrapper
+                results_wrapper_class = self._res_classes['fit'][1]
 
             result = results_wrapper_class(
                 results_class(self, params, result, **result_kwargs)
             )
-
         return result
 
     def smooth(self, params, transformed=True, complex_step=False,
@@ -583,22 +591,8 @@ class MLEModel(tsbase.TimeSeriesModel):
         # Get the state space output
         result = self.ssm.smooth(complex_step=complex_step, **kwargs)
 
-        # Wrap in a results object
-        if not return_ssm:
-            result_kwargs = {}
-            if cov_type is not None:
-                result_kwargs['cov_type'] = cov_type
-            if cov_kwds is not None:
-                result_kwargs['cov_kwds'] = cov_kwds
-
-            if results_class is None:
-                results_class = MLEResults
-            if results_wrapper_class is None:
-                results_wrapper_class = MLEResultsWrapper
-
-            result = results_wrapper_class(
-                results_class(self, params, result, **result_kwargs)
-            )
+        result = self._wrap_results(result, params,
+                                    return_ssm, cov_type, cov_kwds)
 
         return result
 
@@ -2852,20 +2846,20 @@ class PredictionResults(pred.PredictionResults):
         # TODO: this performs metadata wrapping, and that should be handled
         #       by attach_* methods. However, they don't currently support
         #       this use case.
-        conf_int = super(PredictionResults, self).conf_int(
-            method, alpha, **kwds)
+        conf_int = super(PredictionResults, self).conf_int(method, alpha,
+                                                           **kwds)
 
         # Create a dataframe
         if self.row_labels is not None:
-            conf_int = pd.DataFrame(conf_int, index=self.row_labels)
-
             # Attach the endog names
             ynames = self.model.data.ynames
             if not type(ynames) == list:
                 ynames = [ynames]
             names = (['lower %s' % name for name in ynames] +
                      ['upper %s' % name for name in ynames])
-            conf_int.columns = names
+
+            conf_int = pd.DataFrame(conf_int, index=self.row_labels,
+                                    columns=names)
 
         return conf_int
 
