@@ -52,6 +52,10 @@ class GenericZeroInflated(CountModel):
     """ % {'params' : base._model_params_doc,
            'extra_params' : _doc_zi_params + base._missing_param_doc}
 
+    @property
+    def _res_classes(self):
+        raise NotImplementedError('must be implemented by subclass')
+
     def __init__(self, endog, exog, exog_infl=None, offset=None,
                  inflation='logit', exposure=None, missing='none', **kwargs):
         super(GenericZeroInflated, self).__init__(endog, exog, offset=offset,
@@ -183,8 +187,9 @@ class GenericZeroInflated(CountModel):
                        full_output=full_output, callback=callback,
                        **kwargs)
 
-        zipfit = self.result_class(self, mlefit._results)
-        result = self.result_class_wrapper(zipfit)
+        (res_class, wrap_class) = self._res_classes['fit']
+        zipfit = res_class(self, mlefit._results)
+        result = wrap_class(zipfit)
 
         if cov_kwds is None:
             cov_kwds = {}
@@ -223,13 +228,14 @@ class GenericZeroInflated(CountModel):
                 alpha=alpha, trim_mode=trim_mode, auto_trim_tol=auto_trim_tol,
                 size_trim_tol=size_trim_tol, qc_tol=qc_tol, **kwargs)
 
+        (res_class, wrap_class) = self._res_classes['fit_regularized']
         if method in ['l1', 'l1_cvxopt_cp']:
-            discretefit = self.result_class_reg(self, cntfit)
+            discretefit = res_class(self, cntfit)
         else:
             raise TypeError(
                     "argument method == %s, which is not handled" % method)
 
-        return self.result_class_reg_wrapper(discretefit)
+        return wrap_class(discretefit)
 
     fit_regularized.__doc__ = DiscreteModel.fit_regularized.__doc__
 
@@ -478,6 +484,13 @@ class ZeroInflatedPoisson(GenericZeroInflated):
     """ % {'params' : base._model_params_doc,
            'extra_params' : _doc_zi_params + base._missing_param_doc}
 
+    @property
+    def _res_classes(self):
+        return {'fit': (ZeroInflatedPoissonResults,
+                        ZeroInflatedPoissonResultsWrapper),
+                'fit_regularized': (L1ZeroInflatedPoissonResults,
+                                    L1ZeroInflatedPoissonResultsWrapper)}
+
     def __init__(self, endog, exog, exog_infl=None, offset=None, exposure=None,
                  inflation='logit', missing='none', **kwargs):
         super(ZeroInflatedPoisson, self).__init__(endog, exog, offset=offset,
@@ -488,10 +501,6 @@ class ZeroInflatedPoisson(GenericZeroInflated):
         self.model_main = Poisson(self.endog, self.exog, offset=offset,
                                   exposure=exposure)
         self.distribution = zipoisson
-        self.result_class = ZeroInflatedPoissonResults
-        self.result_class_wrapper = ZeroInflatedPoissonResultsWrapper
-        self.result_class_reg = L1ZeroInflatedPoissonResults
-        self.result_class_reg_wrapper = L1ZeroInflatedPoissonResultsWrapper
 
     def _hessian_main(self, params):
         params_infl = params[:self.k_inflate]
@@ -572,6 +581,14 @@ class ZeroInflatedGeneralizedPoisson(GenericZeroInflated):
         ZIGP-1 and p=2 for ZIGP-2. Default is p=2
     """ + base._missing_param_doc}
 
+    @property
+    def _res_classes(self):
+        return {'fit': (ZeroInflatedGeneralizedPoissonResults,
+                        ZeroInflatedGeneralizedPoissonResultsWrapper),
+                'fit_regularized': (
+                    L1ZeroInflatedGeneralizedPoissonResults,
+                    L1ZeroInflatedGeneralizedPoissonResultsWrapper)}
+
     def __init__(self, endog, exog, exog_infl=None, offset=None, exposure=None,
                  inflation='logit', p=2, missing='none', **kwargs):
         super(ZeroInflatedGeneralizedPoisson, self).__init__(endog, exog,
@@ -586,10 +603,6 @@ class ZeroInflatedGeneralizedPoisson(GenericZeroInflated):
         self.k_exog += 1
         self.k_extra += 1
         self.exog_names.append("alpha")
-        self.result_class = ZeroInflatedGeneralizedPoissonResults
-        self.result_class_wrapper = ZeroInflatedGeneralizedPoissonResultsWrapper
-        self.result_class_reg = L1ZeroInflatedGeneralizedPoissonResults
-        self.result_class_reg_wrapper = L1ZeroInflatedGeneralizedPoissonResultsWrapper
 
     def _get_init_kwds(self):
         kwds = super(ZeroInflatedGeneralizedPoisson, self)._get_init_kwds()
@@ -649,6 +662,14 @@ class ZeroInflatedNegativeBinomialP(GenericZeroInflated):
         ZINB-1 and p=2 for ZINM-2. Default is p=2
     """ + base._missing_param_doc}
 
+    @property
+    def _res_classes(self):
+        return {'fit': (ZeroInflatedNegativeBinomialResults,
+                        ZeroInflatedNegativeBinomialResultsWrapper),
+                'fit_regularized': (
+                    L1ZeroInflatedNegativeBinomialResults,
+                    L1ZeroInflatedNegativeBinomialResultsWrapper)}
+
     def __init__(self, endog, exog, exog_infl=None, offset=None, exposure=None,
                  inflation='logit', p=2, missing='none', **kwargs):
         super(ZeroInflatedNegativeBinomialP, self).__init__(endog, exog,
@@ -663,10 +684,6 @@ class ZeroInflatedNegativeBinomialP(GenericZeroInflated):
         self.k_exog += 1
         self.k_extra += 1
         self.exog_names.append("alpha")
-        self.result_class = ZeroInflatedNegativeBinomialResults
-        self.result_class_wrapper = ZeroInflatedNegativeBinomialResultsWrapper
-        self.result_class_reg = L1ZeroInflatedNegativeBinomialResults
-        self.result_class_reg_wrapper = L1ZeroInflatedNegativeBinomialResultsWrapper
 
     def _get_init_kwds(self):
         kwds = super(ZeroInflatedNegativeBinomialP, self)._get_init_kwds()
