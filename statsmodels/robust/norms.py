@@ -1,7 +1,8 @@
 from statsmodels.compat.python import range
 import numpy as np
 
-#TODO: add plots to weighting functions for online docs.
+# TODO: add plots to weighting functions for online docs.
+
 
 
 class RobustNorm(object):
@@ -270,7 +271,7 @@ class HuberT(RobustNorm):
         return np.less_equal(np.fabs(z), self.t)
 
 
-#TODO: untested, but looks right.  RamsayE not available in R or SAS?
+# TODO: untested, but looks right.  RamsayE not available in R or SAS?
 class RamsayE(RobustNorm):
     """
     Ramsay's Ea for M estimation.
@@ -286,7 +287,7 @@ class RamsayE(RobustNorm):
     statsmodels.robust.norms.RobustNorm
     """
 
-    def __init__(self, a = .3):
+    def __init__(self, a=.3):
         self.a = a
 
     def rho(self, z):
@@ -355,8 +356,9 @@ class RamsayE(RobustNorm):
         Used to estimate the robust covariance matrix.
         """
 
-        return np.exp(-self.a * np.fabs(z)) + z**2*\
-                np.exp(-self.a*np.fabs(z))*-self.a/np.fabs(z)
+        return (np.exp(-self.a * np.fabs(z)) +
+                z**2 * np.exp(-self.a * np.fabs(z)) * -self.a / np.fabs(z))
+
 
 
 class AndrewWave(RobustNorm):
@@ -628,7 +630,9 @@ class Hampel(RobustNorm):
         """
 
         z = np.fabs(z)
-        a = self.a; b = self.b; c = self.c
+        a = self.a
+        b = self.b
+        c = self.c
         t1, t2, t3 = self._subset(z)
         v = (t1 * z**2 * 0.5 +
              t2 * (a * z - a**2 * 0.5) +
@@ -659,7 +663,9 @@ class Hampel(RobustNorm):
             psi(z) = 0                            for \|z\| > c
         """
         z = np.asarray(z)
-        a = self.a; b = self.b; c = self.c
+        a = self.a
+        b = self.b
+        c = self.c
         t1, t2, t3 = self._subset(z)
         s = np.sign(z)
         z = np.fabs(z)
@@ -692,12 +698,14 @@ class Hampel(RobustNorm):
 
         """
         z = np.asarray(z)
-        a = self.a; b = self.b; c = self.c
+        a = self.a
+        b = self.b
+        c = self.c
         t1, t2, t3 = self._subset(z)
         v = (t1 +
-            t2 * a/np.fabs(z) +
-            t3 * a*(c-np.fabs(z))/(np.fabs(z)*(c-b)))
-        v[np.where(np.isnan(v))]=1. # for some reason 0 returns a nan?
+             t2 * a/np.fabs(z) +
+             t3 * a*(c-np.fabs(z))/(np.fabs(z)*(c-b)))
+        v[np.where(np.isnan(v))] = 1.  # for some reason 0 returns a nan?
         return v
 
     def psi_deriv(self, z):
@@ -721,7 +729,7 @@ class TukeyBiweight(RobustNorm):
     Tukey's biweight is sometime's called bisquare.
     """
 
-    def __init__(self, c = 4.685):
+    def __init__(self, c=4.685):
         self.c = c
 
     def _subset(self, z):
@@ -804,8 +812,9 @@ class TukeyBiweight(RobustNorm):
         Used to estimate the robust covariance matrix.
         """
         subset = self._subset(z)
-        return subset*((1 - (z/self.c)**2)**2 - (4*z**2/self.c**2) *\
-                    (1-(z/self.c)**2))
+        return subset*((1 - (z/self.c)**2)**2 -
+                       (4*z**2/self.c**2) * (1-(z/self.c)**2))
+
 
 def estimate_location(a, scale, norm=None, axis=0, initial=None,
                       maxiter=30, tol=1.0e-06):
