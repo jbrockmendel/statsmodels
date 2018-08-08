@@ -1,15 +1,17 @@
-from statsmodels.compat.python import iteritems, StringIO
 import warnings
 
+import numpy.testing as npt
+import numpy as np
+import pandas as pd
+import pandas.util.testing as tm
+
+from statsmodels.compat.python import iteritems, StringIO
 from statsmodels.formula.api import ols
 from statsmodels.formula.formulatools import make_hypotheses_matrices
 from statsmodels.tools import add_constant
 from statsmodels.datasets.longley import load, load_pandas
 from statsmodels.datasets import cpunish
-
-import numpy.testing as npt
 from statsmodels.tools.testing import assert_equal
-import numpy as np
 
 
 longley_formula = 'TOTEMP ~ GNPDEFL + GNP + UNEMP + ARMED + POP + YEAR'
@@ -129,10 +131,10 @@ def test_formula_labels():
 
 
 def test_formula_predict():
-    # `log` is needed in the namespace for patsy to find
+    # patsy needs `log` in the namespace
+    # pylint:disable=unused-variable
     from numpy import log  # noqa:F401
-    formula = """TOTEMP ~ log(GNPDEFL) + log(GNP) + UNEMP + ARMED +
-                    POP + YEAR"""
+    formula = "TOTEMP ~ log(GNPDEFL) + log(GNP) + UNEMP + ARMED + POP + YEAR"
     data = load_pandas()
     dta = load_pandas().data
     results = ols(formula, dta).fit()
@@ -141,8 +143,6 @@ def test_formula_predict():
 
 
 def test_formula_predict_series():
-    import pandas as pd
-    import pandas.util.testing as tm
     data = pd.DataFrame({"y": [1, 2, 3], "x": [1, 2, 3]}, index=[5, 3, 1])
     results = ols('y ~ x', data).fit()
 
@@ -186,7 +186,7 @@ def test_patsy_lazy_dict():
 
     res2 = res.predict(data)
     assert_equal(res.fittedvalues, res2)  # Should lose a record
-    assert_equal(len(res2) + 1, len(cpunish.load_pandas().data))
+    npt.assert_equal(len(res2) + 1, len(cpunish.load_pandas().data))
 
 
 def test_patsy_missing_data():
@@ -207,5 +207,6 @@ def test_patsy_missing_data():
         res2 = res.predict(data)
         assert 'ValueWarning' in repr(w[-1].message)
         assert 'nan values have been dropped' in repr(w[-1].message)
-    # Frist record will be dropped in both cases
+
+    # First record will be dropped in both cases
     assert_equal(res.fittedvalues, res2)

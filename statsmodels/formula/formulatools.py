@@ -104,8 +104,6 @@ def _intercept_idx(design_info):
 
 
 def make_hypotheses_matrices(model_results, test_formula):
-    """
-    """
     from patsy.constraint import linear_constraint
     exog_names = model_results.model.exog_names
     LC = linear_constraint(test_formula, exog_names)
