@@ -3,13 +3,13 @@ Tests of save / load / remove_data state space functionality.
 """
 
 from __future__ import division, absolute_import, print_function
-from statsmodels.compat import cPickle
 
-import tempfile
 import os
+import tempfile
 
 import pytest
 
+from statsmodels.compat import cPickle
 from statsmodels import datasets
 from statsmodels.tsa.statespace import (sarimax, structural, varmax,
                                         dynamic_factor)
