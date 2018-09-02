@@ -17,7 +17,6 @@ from __future__ import division, absolute_import, print_function
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_equal, assert_allclose
-import pytest
 
 from statsmodels.compat import cPickle
 from statsmodels.tsa.statespace import sarimax
@@ -137,7 +136,9 @@ def test_kalman_filter_pickle(data):
 def test_representation_pickle():
     nobs = 10
     k_endog = 2
-    endog = np.asfortranarray(np.arange(nobs * k_endog).reshape(k_endog, nobs) * 1.)
+    endog = np.asfortranarray(
+        np.arange(nobs * k_endog).reshape(k_endog, nobs) * 1.)
+
     mod = Representation(endog, k_states=2)
     pkl_mod = cPickle.loads(cPickle.dumps(mod))
 
