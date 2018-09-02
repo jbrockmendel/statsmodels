@@ -5,21 +5,21 @@ Author: Chad Fulton
 License: Simplified-BSD
 """
 from __future__ import division, absolute_import, print_function
+import os
+import warnings
 
 from statsmodels.compat.platform import PLATFORM_WIN
 
 import numpy as np
+from numpy.testing import (
+    assert_equal, assert_almost_equal, assert_allclose)
 import pandas as pd
 import pytest
-import os
 
-import warnings
 from statsmodels.tsa.statespace import sarimax, tools
 from statsmodels.tsa import arima_model as arima
-from .results import results_sarimax
 from statsmodels.tools import add_constant
-from numpy.testing import (
-    assert_equal, assert_almost_equal, assert_raises, assert_allclose)
+from .results import results_sarimax
 
 
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -209,8 +209,8 @@ class TestARIMAStationary(ARIMA):
     def test_bse(self):
         # test defaults
         assert_equal(self.result.cov_type, 'opg')
-        assert_equal(self.result._cov_approx_complex_step, True)
-        assert_equal(self.result._cov_approx_centered, False)
+        assert self.result._cov_approx_complex_step
+        assert not self.result._cov_approx_centered
         # default covariance type (opg)
         assert_allclose(self.result.bse[1], self.true['se_ar_opg'], atol=1e-7)
         assert_allclose(self.result.bse[2], self.true['se_ma_opg'], atol=1e-7)
@@ -277,8 +277,8 @@ class TestARIMADiffuse(ARIMA):
     def test_bse(self):
         # test defaults
         assert_equal(self.result.cov_type, 'opg')
-        assert_equal(self.result._cov_approx_complex_step, True)
-        assert_equal(self.result._cov_approx_centered, False)
+        assert self.result._cov_approx_complex_step
+        assert not self.result._cov_approx_centered
         # default covariance type (opg)
         assert_allclose(self.result.bse[1], self.true['se_ar_opg'], atol=1e-7)
         assert_allclose(self.result.bse[2], self.true['se_ma_opg'], atol=1e-7)
@@ -365,8 +365,8 @@ class TestAdditiveSeasonal(AdditiveSeasonal):
     def test_bse(self):
         # test defaults
         assert_equal(self.result.cov_type, 'opg')
-        assert_equal(self.result._cov_approx_complex_step, True)
-        assert_equal(self.result._cov_approx_centered, False)
+        assert self.result._cov_approx_complex_step
+        assert not self.result._cov_approx_centered
         # default covariance type (opg)
         assert_allclose(self.result.bse[1], self.true['se_ar_opg'], atol=1e-6)
         assert_allclose(self.result.bse[2:4],
@@ -457,8 +457,8 @@ class TestAirlineHamilton(Airline):
     def test_bse(self):
         # test defaults
         assert_equal(self.result.cov_type, 'opg')
-        assert_equal(self.result._cov_approx_complex_step, True)
-        assert_equal(self.result._cov_approx_centered, False)
+        assert self.result._cov_approx_complex_step
+        assert not self.result._cov_approx_centered
         # default covariance type (opg)
         assert_allclose(self.result.bse[0], self.true['se_ma_opg'], atol=1e-6)
         assert_allclose(self.result.bse[1],
@@ -518,8 +518,8 @@ class TestAirlineHarvey(Airline):
     def test_bse(self):
         # test defaults
         assert_equal(self.result.cov_type, 'opg')
-        assert_equal(self.result._cov_approx_complex_step, True)
-        assert_equal(self.result._cov_approx_centered, False)
+        assert self.result._cov_approx_complex_step
+        assert not self.result._cov_approx_centered
         # default covariance type (opg)
         assert_allclose(self.result.bse[0], self.true['se_ma_opg'], atol=1e-6)
         assert_allclose(self.result.bse[1],
@@ -595,8 +595,8 @@ class TestAirlineStateDifferencing(Airline):
     def test_bse(self):
         # test defaults
         assert_equal(self.result.cov_type, 'opg')
-        assert_equal(self.result._cov_approx_complex_step, True)
-        assert_equal(self.result._cov_approx_centered, False)
+        assert self.result._cov_approx_complex_step
+        assert not self.result._cov_approx_centered
         # default covariance type (opg)
         assert_allclose(self.result.bse[0], self.true['se_ma_opg'], atol=1e-6)
         assert_allclose(self.result.bse[1],
@@ -687,8 +687,8 @@ class TestFriedmanMLERegression(Friedman):
     def test_bse(self):
         # test defaults
         assert_equal(self.result.cov_type, 'opg')
-        assert_equal(self.result._cov_approx_complex_step, True)
-        assert_equal(self.result._cov_approx_centered, False)
+        assert self.result._cov_approx_complex_step
+        assert not self.result._cov_approx_centered
         # default covariance type (opg)
         assert_allclose(self.result.bse[0:2],
                         self.true['se_exog_opg'],
@@ -804,8 +804,8 @@ class TestFriedmanStateRegression(Friedman):
     def test_bse(self):
         # test defaults
         assert_equal(self.result.cov_type, 'opg')
-        assert_equal(self.result._cov_approx_complex_step, True)
-        assert_equal(self.result._cov_approx_centered, False)
+        assert self.result._cov_approx_complex_step
+        assert not self.result._cov_approx_centered
         # default covariance type (opg)
         assert_allclose(self.result.bse[0], self.true['se_ar_opg'], atol=1e-2)
         assert_allclose(self.result.bse[1], self.true['se_ma_opg'], atol=1e-2)
@@ -2125,17 +2125,21 @@ def test_misc_exog():
 
         # Smoke tests for invalid exog
         oos_exog = np.random.normal(size=(1))
-        assert_raises(ValueError, res.forecast, steps=1, exog=oos_exog)
+        with pytest.raises(ValueError):
+            res.forecast(steps=1, exog=oos_exog)
 
         oos_exog = np.random.normal(size=(2, mod.k_exog))
-        assert_raises(ValueError, res.forecast, steps=1, exog=oos_exog)
+        with pytest.raises(ValueError):
+            res.forecast(steps=1, exog=oos_exog)
 
         oos_exog = np.random.normal(size=(1, mod.k_exog + 1))
-        assert_raises(ValueError, res.forecast, steps=1, exog=oos_exog)
+        with pytest.raises(ValueError):
+            res.forecast(steps=1, exog=oos_exog)
 
     # Test invalid model specifications
-    assert_raises(ValueError, sarimax.SARIMAX, endog, exog=np.zeros((10, 4)),
-                  order=(1, 1, 0))
+    with pytest.raises(ValueError):
+        sarimax.SARIMAX(endog, exog=np.zeros((10, 4)),
+                        order=(1, 1, 0))
 
 
 def test_datasets():
@@ -2154,7 +2158,7 @@ def test_predict_custom_index():
     mod = sarimax.SARIMAX(endog, order=(1, 0, 0))
     res = mod.smooth(mod.start_params)
     out = res.predict(start=1, end=1, index=['a'])
-    assert_equal(out.index.equals(pd.Index(['a'])), True)
+    assert out.index.equals(pd.Index(['a']))
 
 
 def test_arima000():
