@@ -48,6 +48,7 @@ def get_results(n, p, ext, ties):
     hazard = getattr(survival_r_results, hazard_name)
     return coef, se, time, hazard
 
+
 class TestPHReg(object):
 
     # Load a data file from the results directory

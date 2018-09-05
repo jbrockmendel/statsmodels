@@ -55,6 +55,7 @@ if [ "$LINT" == true ]; then
         statsmodels/tools/decorators.py \
         statsmodels/tools/tests/test_decorators.py \
         statsmodels/tsa/base/tests/test_datetools.py \
+        statsmodels/tsa/regime_switching \
         statsmodels/tsa/vector_ar/dynamic.py \
         statsmodels/tsa/statespace/tests/results/results_var_R.py \
         statsmodels/tsa/statespace/tests/test_var.py \
@@ -64,6 +65,23 @@ if [ "$LINT" == true ]; then
         echo "Previously passing files failed linting."
         RET=1
     fi
+
+    # Run a subset of checks on a subset of files; once these checks are
+    # passing on all files, this block can be removed
+    echo "Linting for spacing in a subset of files"
+    flake8 --select=E301,E302,E303,E304,E305 \
+        tools/ \
+        examples/ \
+        statsmodels/*.py \
+        statsmodels/base/ \
+        statsmodels/duration/ \
+        statsmodels/emplike/ \
+        statsmodels/formula/ \
+        statsmodels/imputation/ \
+        statsmodels/interface/ \
+        statsmodels/multivariate/ \
+        statsmodels/resampling/ \
+        statsmodels/tsa/
 
     # Tests any new python files
     if [ -f $(git rev-parse --git-dir)/shallow ]; then
