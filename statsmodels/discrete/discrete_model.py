@@ -3483,6 +3483,17 @@ class DiscreteResults(base.LikelihoodModelResults):
 
     @cache_readonly
     def resid_response(self):
+        """
+        The response residuals
+
+        Notes
+        -----
+        Response residuals are defined to be
+
+        .. math:: y - p
+
+        where :math:`p=cdf(X\\beta)`.
+        """
         return self.model.endog - self.fittedvalues
 
     @cache_readonly
@@ -3682,21 +3693,6 @@ class CountResults(DiscreteResults):
         "one_line_description": "A results class for count data",
         "extra_attr": ""}
 
-    @cache_readonly
-    def resid(self):
-        """
-        Residuals
-
-        Notes
-        -----
-        The residuals for Count models are defined as
-
-        .. math:: y - p
-
-        where :math:`p = \\exp(X\\beta)`. Any exposure and offset variables
-        are also handled.
-        """
-        return self.model.endog - self.fittedvalues
 
 class NegativeBinomialResults(CountResults):
     __doc__ = _discrete_results_docs % {
@@ -3803,7 +3799,6 @@ class PoissonResults(CountResults):
 
         For now :math:`M_j` is always set to 1.
         """
-        # Pearson residuals
         p = self.fittedvalues
         return (self.model.endog - p)/np.sqrt(p)
 
@@ -3936,20 +3931,6 @@ class BinaryResults(DiscreteResults):
         p = self.fittedvalues
         return (endog - M*p)/np.sqrt(M*p*(1-p))
 
-    @cache_readonly
-    def resid_response(self):
-        """
-        The response residuals
-
-        Notes
-        -----
-        Response residuals are defined to be
-
-        .. math:: y - p
-
-        where :math:`p=cdf(X\\beta)`.
-        """
-        return self.model.endog - self.fittedvalues
 
 class LogitResults(BinaryResults):
     __doc__ = _discrete_results_docs % {
@@ -3969,8 +3950,8 @@ class LogitResults(BinaryResults):
         where :math:`p=cdf(X\\beta)`. This is the same as the `resid_response`
         for the Logit model.
         """
-        # Generalized residuals
         return self.model.endog - self.fittedvalues
+
 
 class ProbitResults(BinaryResults):
     __doc__ = _discrete_results_docs % {
