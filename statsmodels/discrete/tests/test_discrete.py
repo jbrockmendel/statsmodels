@@ -1615,7 +1615,7 @@ def test_binary_pred_table_zeros():
     assert_equal(res.pred_table(), expected)
 
 
-class TestGeneralizedPoisson_p2():
+class TestGeneralizedPoisson_p2(object):
     # Test Generalized Poisson model
 
     @classmethod
