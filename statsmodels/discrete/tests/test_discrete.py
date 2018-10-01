@@ -73,9 +73,13 @@ class CheckModelResults(object):
         assert_allclose(self.res1.pvalues[:len(self.res2.pvalues)],
                         self.res2.pvalues, rtol=rtol, atol=1e-19)
 
-#    def test_cov_params(self):
-#        assert_almost_equal(self.res1.cov_params(), self.res2.cov_params,
-#                DECIMAL_4)
+    def test_cov_params(self):
+        if getattr(self.res2, "cov_params", None) is None:
+            pytest.skip("External validation results do not "
+                        "have `cov_params`")
+        assert_allclose(self.res1.cov_params(),
+                        self.res2.cov_params,
+                        atol=1.5e-4)
 
     def test_llf(self):
         assert_almost_equal(self.res1.llf, self.res2.llf, DECIMAL_4)
@@ -1076,9 +1080,6 @@ class TestNegativeBinomialNB2Newton(CheckModelResults):
         # pvalues for NB2 and NBP2 has lower agreement
         cls.rtol_pvalues = 0.04
 
-    def test_jac(self):
-        pass
-
     #NOTE: The bse is much closer precitions to stata
     def test_bse(self):
         assert_almost_equal(self.res1.bse, self.res2.bse, DECIMAL_3)
@@ -1125,9 +1126,6 @@ class TestNegativeBinomialNB1Newton(CheckModelResults):
         assert_almost_equal(self.res1.conf_int(), self.res2.conf_int,
                             DECIMAL_2)
 
-    def test_jac(self):
-        pass
-
 
 class TestNegativeBinomialNB2BFGS(CheckModelResults):
 
@@ -1143,9 +1141,6 @@ class TestNegativeBinomialNB2BFGS(CheckModelResults):
         cls.res2 = res2
 
         cls.rtol_pvalues = 0.04
-
-    def test_jac(self):
-        pass
 
     #NOTE: The bse is much closer precitions to stata
     def test_bse(self):
@@ -1201,9 +1196,6 @@ class TestNegativeBinomialNB1BFGS(CheckModelResults):
         assert_almost_equal(self.res1.conf_int(), self.res2.conf_int,
                             DECIMAL_2)
 
-    def test_jac(self):
-        pass
-
 
 class TestNegativeBinomialGeometricBFGS(CheckModelResults):
     # Cannot find another implementation of the geometric to cross-check results
@@ -1235,9 +1227,6 @@ class TestNegativeBinomialGeometricBFGS(CheckModelResults):
     def test_conf_int(self):
         assert_almost_equal(self.res1.conf_int(), self.res2.conf_int,
                             DECIMAL_3)
-
-    def test_jac(self):
-        pass
 
     def test_params(self):
         assert_almost_equal(self.res1.params, self.res2.params, DECIMAL_3)
