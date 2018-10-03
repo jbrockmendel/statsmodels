@@ -3483,17 +3483,6 @@ class DiscreteResults(base.LikelihoodModelResults):
 
     @cache_readonly
     def resid_response(self):
-        """
-        The response residuals
-
-        Notes
-        -----
-        Response residuals are defined to be
-
-        .. math:: y - p
-
-        where :math:`p=cdf(X\\beta)`.
-        """
         return self.model.endog - self.fittedvalues
 
     @cache_readonly
@@ -3930,6 +3919,23 @@ class BinaryResults(DiscreteResults):
         M = 1
         p = self.fittedvalues
         return (endog - M*p)/np.sqrt(M*p*(1-p))
+
+    @cache_readonly
+    def resid_response(self):
+        """
+        The response residuals
+
+        Notes
+        -----
+        Response residuals are defined to be
+
+        .. math:: y - p
+
+        where :math:`p=cdf(X\\beta)`.
+        """
+        # GH#5255 implementation is the same as the DiscreteResults;
+        #  but we have a more specific docstring here.
+        return super(BinaryResults, self).resid_response
 
 
 class LogitResults(BinaryResults):

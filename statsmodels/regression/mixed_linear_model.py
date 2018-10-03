@@ -2205,6 +2205,17 @@ class MixedLMResults(base.LikelihoodModelResults, base.ResultMixin):
         return fit
 
     @cache_readonly
+    def resid(self):
+        """
+        Returns the residuals for the model.
+
+        The residuals reflect the mean structure specified by the
+        fixed effects and the predicted random effects.
+        """
+        # GH#5255 method is the same as base class, more specific docstring
+        return super(MixedLMResults, self).resid
+
+    @cache_readonly
     def bse_fe(self):
         """
         Returns the standard errors of the fixed effect regression

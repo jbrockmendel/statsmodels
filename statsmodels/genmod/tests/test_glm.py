@@ -82,9 +82,7 @@ class CheckModelResultsMixin(object):
 
     def test_resid_response(self):
         # GH5255
-        assert_allclose(self.res1.resid,
-                        self.res1.resid_response,
-                        rtol=1e-13)
+        assert_allclose(self.res1.resid, self.res1.resid_response, rtol=1e-13)
 
     decimal_aic_R = DECIMAL_4
 

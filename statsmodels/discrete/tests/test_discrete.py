@@ -134,12 +134,8 @@ class CheckModelResults(object):
             endog = self.res1.model.endog
 
         resid = (endog - fitted)
-        assert_allclose(self.res1.resid,
-                        resid,
-                        atol=1e-10)
-        assert_allclose(self.res1.resid,
-                        self.res1.resid_response,
-                        atol=1e-10)
+        assert_allclose(self.res1.resid, resid, atol=1e-10)
+        assert_allclose(self.res1.resid, self.res1.resid_response, atol=1e-10)
 
     def test_predict_xb(self):
         # GH#5255
