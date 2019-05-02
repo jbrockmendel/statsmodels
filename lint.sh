@@ -18,7 +18,6 @@ if [ "$LINT" == true ]; then
     echo "Linting known clean files with strict rules"
     flake8 --isolated \
         statsmodels/resampling/ \
-        statsmodels/formula/ \
         statsmodels/interface/ \
         statsmodels/compat/ \
         statsmodels/duration/__init__.py \

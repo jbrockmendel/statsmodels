@@ -124,8 +124,7 @@ def test_formula_labels():
                    '"janitor","bc",7,20,8\n'
                    '"policeman","bc",34,47,41\n'
                    '"waiter","bc",8,32,10')
-    from pandas import read_csv
-    dta = read_csv(dta)
+    dta = pd.read_csv(dta)
     model = ols("prestige ~ income + education", dta).fit()
     assert_equal(model.fittedvalues.index, dta.index)
 
