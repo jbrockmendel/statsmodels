@@ -596,7 +596,6 @@ def test_prediction_increment_nonpandas():
     assert_equal(out_of_sample, 1)
     assert_equal(prediction_index is None, True)
 
-
     # Test getting a location that exists in the (internal) index
     loc, index, index_was_expanded = mod._get_index_loc(2)
     assert_equal(loc, 2)
@@ -716,7 +715,6 @@ def test_prediction_increment_pandas_dates():
     assert_equal(out_of_sample, 3)
     desired_index = pd.date_range(start='1950-01-01', periods=8, freq='D')
     assert_equal(prediction_index.equals(desired_index), True)
-
 
     # Test getting a location that exists in the (internal) index
     loc, index, index_was_expanded = mod._get_index_loc(2)

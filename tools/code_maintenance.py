@@ -29,7 +29,6 @@ def remove_whitespace(fname):
     fd.close()
 
 
-
 def find_whitespace(fname):
     fd = open(fname, mode='U')
     for line in fd.readlines():
