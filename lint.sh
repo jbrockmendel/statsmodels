@@ -30,6 +30,7 @@ if [ "$LINT" == true ]; then
         statsmodels/graphics/tsaplots.py \
         statsmodels/emplike/tests/ \
         statsmodels/examples/tests/ \
+        statsmodels/imputation/tests/ \
         statsmodels/iolib/smpickle.py \
         statsmodels/iolib/tests/test_pickle.py \
         statsmodels/iolib/tests/results/ \

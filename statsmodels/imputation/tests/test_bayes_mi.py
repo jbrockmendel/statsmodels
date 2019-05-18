@@ -158,10 +158,11 @@ def test_mi_formula():
     mi = MI(imp, sm.OLS, formula=fml, burn=0,
             model_kwds_fn=model_kwds_fn)
 
-    results_cb = lambda x: x
+    def results_cb(x):
+        return x
 
     r = mi.fit(results_cb=results_cb)
-    r.summary()  # smoke test
+    r.summary()  # smoke test  # TODO: pytest.mark.smoke
     # TODO: why does the test tolerance need to be so slack?
     # There is unexpected variation across versions on travis.
     assert_allclose(r.params, np.r_[

@@ -1,10 +1,14 @@
+import warnings
+
 import numpy as np
+from numpy.testing import assert_equal, assert_allclose
 import pandas as pd
 import pytest
-from statsmodels.imputation import mice
+
 import statsmodels.api as sm
-from numpy.testing import assert_equal, assert_allclose
-import warnings
+from statsmodels.imputation import mice
+from statsmodels.genmod.generalized_linear_model import GLMResultsWrapper
+from statsmodels.regression.linear_model import RegressionResultsWrapper
 
 try:
     import matplotlib.pyplot as plt
@@ -96,7 +100,8 @@ class TestMICEData(object):
         fml = 'x1 ~ x2 + x3 + x4 + x5 + y'
         assert_equal(imp_data.conditional_formula['x1'], fml)
 
-        assert_equal(imp_data._cycle_order, ['x5', 'x3', 'x4', 'y', 'x2', 'x1'])
+        assert_equal(imp_data._cycle_order,
+                     ['x5', 'x3', 'x4', 'y', 'x2', 'x1'])
 
         # Should make a copy
         assert(not (df is imp_data.data))
@@ -108,7 +113,9 @@ class TestMICEData(object):
         assert_equal(exog_miss.shape, [10, 6])
 
     def test_settingwithcopywarning(self):
-        "Test that MICEData does not throw a SettingWithCopyWarning when imputing (https://github.com/statsmodels/statsmodels/issues/5430)"
+        # Test that MICEData does not throw a SettingWithCopyWarning
+        #  when imputing
+        #  (https://github.com/statsmodels/statsmodels/issues/5430)"
 
         df = gendat()
         # There need to be some ints in here for the error to be thrown
@@ -122,11 +129,14 @@ class TestMICEData(object):
                 warnings.simplefilter('always')
                 miceData.update_all()
 
-                # on Python 3.4, throws warning
-                # "DeprecationWarning('pandas.core.common.is_categorical_dtype is deprecated. import from the public API:
-                # pandas.api.types.is_categorical_dtype instead',)"
-                # ignore this warning, as this is not what is being tested in this test
-                assert ((len(ws) == 0) or all([w.category == DeprecationWarning for w in ws]))
+                # on Python 3.4, throws warning:
+                # "DeprecationWarning('pandas.core.common.is_categorical_dtype
+                #  is deprecated. import from the public API:
+                #  pandas.api.types.is_categorical_dtype instead',)"
+                # ignore this warning, as this is not what is being tested
+                # in this test
+                assert (len(ws) == 0 or
+                        all([w.category == DeprecationWarning for w in ws]))
 
     def test_next_sample(self):
 
@@ -141,8 +151,7 @@ class TestMICEData(object):
             all_x.append(x)
 
         # The returned dataframes are all the same object
-        assert(all_x[0] is all_x[1])
-
+        assert all_x[0] is all_x[1]
 
     def test_pertmeth(self):
         # Test with specified perturbation method.
@@ -162,8 +171,8 @@ class TestMICEData(object):
                 assert_equal(imp_data.data.shape[1], ncol)
                 assert_allclose(orig[mx], imp_data.data[mx])
 
-        assert_equal(imp_data._cycle_order, ['x5', 'x3', 'x4', 'y', 'x2', 'x1'])
-
+        assert_equal(imp_data._cycle_order,
+                     ['x5', 'x3', 'x4', 'y', 'x2', 'x1'])
 
     def test_phreg(self):
 
@@ -189,24 +198,23 @@ class TestMICEData(object):
         def cb(imp):
             hist.append(imp.data.shape)
 
-        for pm in "gaussian", "boot":
-            idata = mice.MICEData(df, perturbation_method=pm, history_callback=cb)
-            idata.set_imputer("time", "0 + x1 + x2", model_class=PHReg,
-                              init_kwds={"status": mice.PatsyFormula("status")},
-                              predict_kwds={"pred_type": "hr"},
-                              perturbation_method=pm)
+        for pm in ["gaussian", "boot"]:
+            idata = mice.MICEData(df,
+                                  perturbation_method=pm, history_callback=cb)
+            idata.set_imputer(
+                "time", "0 + x1 + x2",
+                model_class=PHReg,
+                init_kwds={"status": mice.PatsyFormula("status")},
+                predict_kwds={"pred_type": "hr"},
+                perturbation_method=pm)
 
             x = idata.next_sample()
-            assert(isinstance(x, pd.DataFrame))
+            assert isinstance(x, pd.DataFrame)
 
         assert(all([val == (299, 4) for val in hist]))
 
     def test_set_imputer(self):
         # Test with specified perturbation method.
-
-        from statsmodels.regression.linear_model import RegressionResultsWrapper
-        from statsmodels.genmod.generalized_linear_model import GLMResultsWrapper
-
         df = gendat()
         orig = df.copy()
         mx = pd.notnull(df)
@@ -224,12 +232,14 @@ class TestMICEData(object):
         assert_allclose(orig[mx], imp_data.data[mx])
         for j in range(1, 6):
             if j == 3:
-                assert_equal(isinstance(imp_data.models['x3'], sm.GLM), True)
-                assert_equal(isinstance(imp_data.models['x3'].family, sm.families.Binomial), True)
-                assert_equal(isinstance(imp_data.results['x3'], GLMResultsWrapper), True)
+                assert isinstance(imp_data.models['x3'], sm.GLM)
+                assert isinstance(imp_data.models['x3'].family,
+                                  sm.families.Binomial)
+                assert isinstance(imp_data.results['x3'], GLMResultsWrapper)
             else:
-                assert_equal(isinstance(imp_data.models['x%d' % j], sm.OLS), True)
-                assert_equal(isinstance(imp_data.results['x%d' % j], RegressionResultsWrapper), True)
+                assert isinstance(imp_data.models['x%d' % j], sm.OLS)
+                assert isinstance(imp_data.results['x%d' % j],
+                                  RegressionResultsWrapper)
 
         fml = 'x1 ~ x3 + x4 + x3*x4'
         assert_equal(imp_data.conditional_formula['x1'], fml)
@@ -237,26 +247,28 @@ class TestMICEData(object):
         fml = 'x4 ~ x1 + x2 + x3 + x5 + y'
         assert_equal(imp_data.conditional_formula['x4'], fml)
 
-        assert_equal(imp_data._cycle_order, ['x5', 'x3', 'x4', 'y', 'x2', 'x1'])
+        assert_equal(imp_data._cycle_order,
+                     ['x5', 'x3', 'x4', 'y', 'x2', 'x1'])
 
-
+    @pytest.mark.smoke
     @pytest.mark.matplotlib
     def test_plot_missing_pattern(self, close_figures):
 
         df = gendat()
         imp_data = mice.MICEData(df)
 
-        for row_order in "pattern", "raw":
-            for hide_complete_rows in False, True:
-                for color_row_patterns in False, True:
+        for row_order in ["pattern", "raw"]:
+            for hide_complete_rows in [False, True]:
+                for color_row_patterns in [False, True]:
                     plt.clf()
-                    fig = imp_data.plot_missing_pattern(row_order=row_order,
-                                      hide_complete_rows=hide_complete_rows,
-                                      color_row_patterns=color_row_patterns)
+                    fig = imp_data.plot_missing_pattern(
+                        row_order=row_order,
+                        hide_complete_rows=hide_complete_rows,
+                        color_row_patterns=color_row_patterns)
                     close_or_save(pdf, fig)
                     close_figures()
 
-
+    @pytest.mark.smoke
     @pytest.mark.matplotlib
     def test_plot_bivariate(self, close_figures):
 
@@ -271,7 +283,6 @@ class TestMICEData(object):
             close_or_save(pdf, fig)
             close_figures()
 
-
     @pytest.mark.matplotlib
     def test_fit_obs(self, close_figures):
 
@@ -285,7 +296,6 @@ class TestMICEData(object):
             fig.get_axes()[0].set_title('plot_fit_scatterplot')
             close_or_save(pdf, fig)
             close_figures()
-
 
     @pytest.mark.matplotlib
     def test_plot_imputed_hist(self, close_figures):
@@ -313,9 +323,9 @@ class TestMICE(object):
 
         assert(issubclass(result.__class__, mice.MICEResults))
 
+        # TODO: separate and mark as pytest.mark.smoke
         # Smoke test for results
-        smr = result.summary()
-
+        result.summary()
 
     def test_MICE1(self):
 
@@ -323,12 +333,9 @@ class TestMICE(object):
         imp_data = mice.MICEData(df)
         mi = mice.MICE("y ~ x1 + x2 + x1:x2", sm.OLS, imp_data)
 
-        from statsmodels.regression.linear_model import RegressionResultsWrapper
-
         for j in range(3):
             x = mi.next_sample()
             assert(issubclass(x.__class__, RegressionResultsWrapper))
-
 
     def test_MICE1_regularized(self):
 
@@ -337,11 +344,7 @@ class TestMICE(object):
         imp.set_imputer('x1', 'x2 + y', fit_kwds={'alpha': 1, 'L1_wt': 0})
         imp.update_all()
 
-
     def test_MICE2(self):
-
-        from statsmodels.genmod.generalized_linear_model import GLMResultsWrapper
-
         df = gendat()
         imp_data = mice.MICEData(df)
         mi = mice.MICE("x3 ~ x1 + x2", sm.GLM, imp_data,
@@ -351,7 +354,6 @@ class TestMICE(object):
             x = mi.next_sample()
             assert(isinstance(x, GLMResultsWrapper))
             assert(isinstance(x.family, sm.families.Binomial))
-
 
     def test_combine(self):
 
@@ -390,10 +392,11 @@ def test_micedata_miss1():
 
     assert_equal(data_imp.data.isnull().values.sum(), 0)
 
-    ix_miss = {'var1': np.array([], dtype=np.int64),
-                 'var2': np.array([1], dtype=np.int64),
-                 'var3': np.array([1, 3], dtype=np.int64),
-                 'var4': np.array([], dtype=np.int64)}
+    ix_miss = {
+        'var1': np.array([], dtype=np.int64),
+        'var2': np.array([1], dtype=np.int64),
+        'var3': np.array([1, 3], dtype=np.int64),
+        'var4': np.array([], dtype=np.int64)}
 
     for k in ix_miss:
         assert_equal(data_imp.ix_miss[k], ix_miss[k])
