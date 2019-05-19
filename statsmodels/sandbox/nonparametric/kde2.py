@@ -31,7 +31,7 @@ class KDE(object):
 
         if n_series > 1:
             if isinstance( kernel, kernels.CustomKernel ):
-                kernel = kernels.NdKernel(n_series, kernels = kernel)
+                kernel = kernels.NdKernel(n_series, kernels=kernel)
 
         self.kernel = kernel
         self.n = n_series  #TODO change attribute
@@ -56,13 +56,13 @@ if __name__ == "__main__":
 
     # 1-D case
     random.seed(142)
-    x = random.standard_t(4.2, size = 50)
+    x = random.standard_t(4.2, size=50)
     h = bw.bw_silverman(x)
     #NOTE: try to do it with convolution
     support = np.linspace(-10,10,512)
 
 
-    kern = kernels.Gaussian(h = h)
+    kern = kernels.Gaussian(h=h)
     kde = KDE( x, kern)
     print(kde.density(1.015469))
     print(0.2034675)

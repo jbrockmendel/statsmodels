@@ -9,7 +9,8 @@ from __future__ import print_function
 import numpy as np
 from scipy import linalg
 
-def tiny2zero(x, eps = 1e-15):
+
+def tiny2zero(x, eps=1e-15):
     '''replace abs values smaller than eps by zero, makes copy
     '''
     mask = np.abs(x.copy()) <  eps

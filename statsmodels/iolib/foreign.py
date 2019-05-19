@@ -472,7 +472,7 @@ class StataReader(object):
         return isinstance(fmt, int) and fmt or \
                 calcsize(self._header['byteorder']+fmt)
 
-    def _col_size(self, k = None):
+    def _col_size(self, k=None):
         """Calculate size of a data record."""
         if len(self._col_sizes) == 0:
             self._col_sizes = lmap(lambda x: self._calcsize(x),

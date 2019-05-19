@@ -92,7 +92,7 @@ from statsmodels.iolib.table import SimpleTable
 
 headers = 'k, AIC, BIC, R2_adj, L1O'.split(', ')
 numformat = ['%6d'] + ['%10.3f']*4 #'%10.4f'
-txt_fmt1 = dict(data_fmts = numformat)
+txt_fmt1 = dict(data_fmts=numformat)
 tabl = SimpleTable(results, headers, None, txt_fmt=txt_fmt1)
 
 print("PCA regression on simulated data,")

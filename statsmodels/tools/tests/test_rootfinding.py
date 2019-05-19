@@ -23,7 +23,6 @@ def func_nan(x, a, b):
     return f
 
 
-
 def funcn(x, a):
     f = -(x - a)**3
     return f
@@ -37,7 +36,7 @@ def test_brentq_expanding():
         (500000, dict(low=10000)),
         (-50000, dict(upp=-1000)),
         (500000, dict(low=300000, upp=700000)),
-        (-50000, dict(low= -70000, upp=-1000))
+        (-50000, dict(low=-70000, upp=-1000))
         ]
 
     funcs = [(func, None),
@@ -61,7 +60,7 @@ def test_brentq_expanding():
 
     # low upp given, but doesn't bound root, leave brentq exception
     # ValueError: f(a) and f(b) must have different signs
-    assert_raises(ValueError, brentq_expanding, funcn, args=(-50000,), low= -40000, upp=-10000)
+    assert_raises(ValueError, brentq_expanding, funcn, args=(-50000,), low=-40000, upp=-10000)
 
     # max_it too low to find root bounds
     # ValueError: f(a) and f(b) must have different signs

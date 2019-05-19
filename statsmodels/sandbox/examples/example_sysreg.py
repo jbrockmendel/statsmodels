@@ -175,7 +175,7 @@ TableF5-1.txt', names=True)
         'tbilrate']][1:].view(float).reshape(-1,2),data3['realcons'][:-1],
         y[:-1]))
     instruments = sm.add_constant(instruments, prepend=False)
-    sem_mod = Sem2SLS(sys3, indep_endog = indep_endog, instruments=instruments)
+    sem_mod = Sem2SLS(sys3, indep_endog=indep_endog, instruments=instruments)
     sem_params = sem_mod.fit()  # first equation is right, but not second?
                                 # should y_t in the diff be instrumented?
                                 # how would R know this in the script?

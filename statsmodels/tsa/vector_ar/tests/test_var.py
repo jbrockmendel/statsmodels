@@ -557,10 +557,10 @@ class TestVARResultsLutkepohl(object):
 
 def test_get_trendorder():
     results = {
-        'c' : 1,
-        'nc' : 0,
-        'ct' : 2,
-        'ctt' : 3
+        'c': 1,
+        'nc': 0,
+        'ct': 2,
+        'ctt': 3
     }
 
     for t, trendorder in iteritems(results):
@@ -602,7 +602,7 @@ def test_var_trend():
 
     data_nc = data - data.mean(0)
     model_nc = sm.tsa.VAR(data_nc)
-    results_nc = model_nc.fit(4, trend = 'nc')
+    results_nc = model_nc.fit(4, trend='nc')
     with pytest.raises(ValueError):
         model.fit(4, trend='t')
 
@@ -614,12 +614,12 @@ def test_irf_trend():
     data = get_macrodata().view((float,3), type=np.ndarray)
 
     model = sm.tsa.VAR(data)
-    results = model.fit(4) #, trend = 'c')
+    results = model.fit(4) #, trend='c')
     irf = results.irf(10)
 
     data_nc = data - data.mean(0)
     model_nc = sm.tsa.VAR(data_nc)
-    results_nc = model_nc.fit(4, trend = 'nc')
+    results_nc = model_nc.fit(4, trend='nc')
     irf_nc = results_nc.irf(10)
 
     assert_allclose(irf_nc.stderr()[1:4], irf.stderr()[1:4], rtol=0.01)
@@ -630,7 +630,7 @@ def test_irf_trend():
     data_t = data + trend[:,None]
 
     model_t = sm.tsa.VAR(data_t)
-    results_t = model_t.fit(4, trend = 'ct')
+    results_t = model_t.fit(4, trend='ct')
     irf_t = results_t.irf(10)
 
     assert_allclose(irf_t.stderr()[1:4], irf.stderr()[1:4], rtol=0.03)

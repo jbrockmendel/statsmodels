@@ -23,7 +23,7 @@ class gaussian_kde_set_covariance(stats.gaussian_kde):
 
 
 class gaussian_kde_covfact(stats.gaussian_kde):
-    def __init__(self, dataset, covfact = 'scotts'):
+    def __init__(self, dataset, covfact='scotts'):
         self.covfact = covfact
         scipy.stats.gaussian_kde.__init__(self, dataset)
 

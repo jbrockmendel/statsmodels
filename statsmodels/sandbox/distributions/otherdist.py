@@ -272,7 +272,7 @@ if __name__ == '__main__':
 
     if doplots:
         import matplotlib.pyplot as plt
-        plt.hist(rvs, bins = 100)
+        plt.hist(rvs, bins=100)
         plt.title('poisson mixture of normal distributions')
 
     #********** clipped normal distribution (Tobit)
@@ -288,13 +288,13 @@ if __name__ == '__main__':
         #plt.figure()
         #cnorm.plot(x)
         plt.figure()
-        cnorm.plot(x = np.linspace(-1, 4, 51), loc=0.5, scale=np.sqrt(2))
+        cnorm.plot(x=np.linspace(-1, 4, 51), loc=0.5, scale=np.sqrt(2))
         plt.title('clipped normal distribution')
 
         fig = plt.figure()
         for i, loc in enumerate([0., 0.5, 1.,2.]):
             fig.add_subplot(2,2,i+1)
-            cnorm.plot(x = np.linspace(-1, 4, 51), loc=loc, scale=np.sqrt(2))
+            cnorm.plot(x=np.linspace(-1, 4, 51), loc=loc, scale=np.sqrt(2))
             plt.title('clipped normal, loc = %3.2f' % loc)
 
 

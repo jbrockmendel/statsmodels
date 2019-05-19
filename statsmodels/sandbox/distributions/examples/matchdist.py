@@ -161,7 +161,7 @@ if __name__ == '__main__':
     results = []
     for i in range(1):
         rvs_orig = stats.t.rvs(dgp_arg,scale=dgp_scale,size=n*convol)
-        rvs_orig = np.hstack((rvs_orig,stats.halflogistic.rvs(loc=0.4, scale=5.0,size =n*(1-convol))))
+        rvs_orig = np.hstack((rvs_orig,stats.halflogistic.rvs(loc=0.4, scale=5.0, size=n*(1-convol))))
         rvs_abs = np.absolute(rvs_orig)
         rvs_pos = rvs_orig[rvs_orig>0]
         rightfactor = 1
@@ -230,7 +230,7 @@ if __name__ == '__main__':
 
     from operator import itemgetter
 
-    res_sort = sorted(results, key = itemgetter(2))
+    res_sort = sorted(results, key=itemgetter(2))
 
     res_sort.reverse()  #kstest statistic: smaller is better, pval larger is better
 
@@ -255,7 +255,7 @@ if __name__ == '__main__':
               (distname, ks_stat, ks_pval, tail_prob))
     ##    print('arg_est = %s, loc_est = %f scale_est = %f)' % \
     ##          (repr(arg_est),loc_est,scale_est))
-        plothist(rvs,distfn,arg_est,loc_est,scale_est,right = rind)
+        plothist(rvs, distfn, arg_est, loc_est, scale_est, right=rind)
         plt.savefig(os.path.join(imagedir,'%s%s%02d_%s.png'% (prefix, ri,ii, distname)))
     ##plt.show()
     ##plt.close()

@@ -545,7 +545,7 @@ class TwoWay(object):
         headers = self.d2_labels
         title = 'Estimated Coefficients by factors'
         table_fmt = dict(
-            data_fmts = ["%#10.4g"]*self.nlevel2)
+            data_fmts=["%#10.4g"]*self.nlevel2)
         return SimpleTable(params_arr, headers, stubs, title=title,
                            txt_fmt=table_fmt)
 

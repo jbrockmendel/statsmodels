@@ -86,7 +86,8 @@ def examples_transf():
     ##print(lognormal.rvs(size=10))
 
     print('Results for lognormal')
-    lognormalg = ExpTransf_gen(stats.norm, a=0, name = 'Log transformed normal general')
+    lognormalg = ExpTransf_gen(stats.norm, a=0,
+                               name='Log transformed normal general')
     print(lognormalg.cdf(1))
     print(stats.lognorm.cdf(1,1))
     print(lognormalg.stats())

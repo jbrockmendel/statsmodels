@@ -124,7 +124,7 @@ def ks_2samp(data1, data2):
 
 
 #from scipy.stats unchanged
-def kstest(rvs, cdf, args=(), N=20, alternative = 'two_sided', mode='approx',**kwds):
+def kstest(rvs, cdf, args=(), N=20, alternative='two_sided', mode='approx', **kwds):
     """
     Perform the Kolmogorov-Smirnov test for goodness of fit
 

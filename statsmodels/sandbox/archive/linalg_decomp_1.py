@@ -218,7 +218,7 @@ def testcompare(m1, m2):
     assert_approx_equal(m1.mlogdet, m2.mlogdet, significant=13)
 
 ####### helper function for interactive work
-def tiny2zero(x, eps = 1e-15):
+def tiny2zero(x, eps=1e-15):
     '''replace abs values smaller than eps by zero, makes copy
     '''
     mask = np.abs(x.copy()) <  eps

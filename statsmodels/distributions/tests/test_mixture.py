@@ -14,8 +14,8 @@ class TestMixtureDistributions(object):
         # Test only medium small sample at 1 decimal
         np.random.seed(0)
         mix = MixtureDistribution()
-        res = mix.rvs([.75,.25], 1000, dist=[stats.norm, stats.norm], kwargs =
-                (dict(loc=-1,scale=.5),dict(loc=1,scale=.5)))
+        res = mix.rvs([.75,.25], 1000, dist=[stats.norm, stats.norm],
+                      kwargs=(dict(loc=-1, scale=.5), dict(loc=1,s cale=.5)))
         npt.assert_almost_equal(
                 np.array([res.std(),res.mean(),res.var()]),
                 np.array([1,-0.5,1]),
@@ -39,8 +39,8 @@ class TestMixtureDistributions(object):
     def test_mixture_pdf(self):
         mix = MixtureDistribution()
         grid = np.linspace(-4,4, 10)
-        res = mix.pdf(grid, [1/3.,2/3.], dist=[stats.norm, stats.norm], kwargs=
-                (dict(loc=-1,scale=.25),dict(loc=1,scale=.75)))
+        res = mix.pdf(grid, [1/3.,2/3.], dist=[stats.norm, stats.norm],
+                      kwargs=(dict(loc=-1, scale=.25), dict(loc=1, scale=.75)))
         npt.assert_almost_equal(
                 res,
                 np.array([  7.92080017e-11,   1.05977272e-07,   3.82368500e-05,
@@ -51,8 +51,8 @@ class TestMixtureDistributions(object):
     def test_mixture_cdf(self):
         mix = MixtureDistribution()
         grid = np.linspace(-4,4, 10)
-        res = mix.cdf(grid, [1/3.,2/3.], dist=[stats.norm, stats.norm], kwargs=
-                   (dict(loc=-1,scale=.25),dict(loc=1,scale=.75)))
+        res = mix.cdf(grid, [1/3.,2/3.], dist=[stats.norm, stats.norm],
+                      kwargs=(dict(loc=-1, scale=.25), dict(loc=1, scale=.75)))
         npt.assert_almost_equal(
                 res,
                 np.array([  8.72261646e-12,   1.40592960e-08,   5.95819161e-06,
@@ -63,8 +63,8 @@ class TestMixtureDistributions(object):
     def test_mixture_rvs_fixed(self):
         mix = MixtureDistribution()
         np.random.seed(1234)
-        res = mix.rvs([.15,.85], 50, dist=[stats.norm, stats.norm], kwargs =
-                (dict(loc=1,scale=.5),dict(loc=-1,scale=.5)))
+        res = mix.rvs([.15,.85], 50, dist=[stats.norm, stats.norm],
+                      kwargs=(dict(loc=1, scale=.5), dict(loc=-1, scale=.5)))
         npt.assert_almost_equal(
                 res,
                 np.array([-0.5794956 , -1.72290504, -1.70098664, -1.0504591 ,

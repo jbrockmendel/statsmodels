@@ -192,7 +192,7 @@ definition r(k) = E{s(n)s*(n-k)} where E{} is the expectation operator.
 #   using std subtracts mean, but correlate doesn't, requires means are exactly 0
 #   biased, no n-k correction for laglength
 #from nitime.utils
-def norm_corr(x,y,mode = 'valid'):
+def norm_corr(x, y, mode='valid'):
     """Returns the correlation between two ndarrays, by calling np.correlate in
 'same' mode and normalizing the result by the std of the arrays and by
 their lengths. This results in a correlation = 1 for an auto-correlation"""

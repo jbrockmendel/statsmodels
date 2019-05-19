@@ -109,10 +109,8 @@ class TestPoissonOffset(CompareMixin):
 
         #cls.res = PoissonOffsetGMLE(data_endog, data_exog[:,1:], offset=offset).fit(start_params = np.ones(6)/2., method='nm')
         modo = PoissonOffsetGMLE(data_endog, data_exog[:,1:], offset=offset)
-        cls.res = modo.fit(start_params = 0.9*cls.res_discrete.params,
-                            method='bfgs', disp=0)
-
-
+        cls.res = modo.fit(start_params=0.9*cls.res_discrete.params,
+                           method='bfgs', disp=0)
 
     def test_params(self):
         assert_almost_equal(self.res.params, self.res_glm.params[1:], DEC)

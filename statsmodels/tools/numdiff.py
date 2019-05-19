@@ -320,7 +320,7 @@ extra_returns="""grad : nparray
         Gradient if return_grad == True
 """,
 equation_number="8",
-equation = """1/(2*d_j*d_k) * ((f(x + d[j]*e[j] + d[k]*e[k]) - f(x + d[j]*e[j])) -
+equation="""1/(2*d_j*d_k) * ((f(x + d[j]*e[j] + d[k]*e[k]) - f(x + d[j]*e[j])) -
                  (f(x + d[k]*e[k]) - f(x)) +
                  (f(x - d[j]*e[j] - d[k]*e[k]) - f(x + d[j]*e[j])) -
                  (f(x - d[k]*e[k]) - f(x)))
@@ -346,7 +346,7 @@ def approx_hess3(x, f, epsilon=None, args=(), kwargs={}):
 approx_hess3.__doc__ = _hessian_docs % dict(scale="4", extra_params="",
                                             extra_returns="",
                                             equation_number="9",
-equation = """1/(4*d_j*d_k) * ((f(x + d[j]*e[j] + d[k]*e[k]) - f(x + d[j]*e[j]
+equation="""1/(4*d_j*d_k) * ((f(x + d[j]*e[j] + d[k]*e[k]) - f(x + d[j]*e[j]
                                                      - d[k]*e[k])) -
                  (f(x - d[j]*e[j] + d[k]*e[k]) - f(x - d[j]*e[j]
                                                      - d[k]*e[k]))""")

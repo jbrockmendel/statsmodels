@@ -73,17 +73,17 @@ class TestGLSARGretl(object):
         #Statistics based on the rho-differenced data:
 
         result_gretl_g1 = dict(
-        endog_mean = ("Mean dependent var",   3.113973),
-        endog_std = ("S.D. dependent var",   18.67447),
-        ssr = ("Sum squared resid",    22530.90),
-        mse_resid_sqrt = ("S.E. of regression",   10.66735),
-        rsquared = ("R-squared",            0.676973),
-        rsquared_adj = ("Adjusted R-squared",   0.673710),
-        fvalue = ("F(2, 198)",            221.0475),
-        f_pvalue = ("P-value(F)",           3.56e-51),
-        resid_acf1 = ("rho",                 -0.003481),
-        dw = ("Durbin-Watson",        1.993858))
-
+            endog_mean=("Mean dependent var",   3.113973),
+            endog_std=("S.D. dependent var",   18.67447),
+            ssr=("Sum squared resid",    22530.90),
+            mse_resid_sqrt=("S.E. of regression",   10.66735),
+            rsquared=("R-squared",            0.676973),
+            rsquared_adj=("Adjusted R-squared",   0.673710),
+            fvalue=("F(2, 198)",            221.0475),
+            f_pvalue=("P-value(F)",           3.56e-51),
+            resid_acf1=("rho",                 -0.003481),
+            dw=("Durbin-Watson",        1.993858)
+        )
 
         #fstatistic, p-value, df1, df2
         reset_2_3 = [5.219019, 0.00619, 2, 197, "f"]
@@ -291,20 +291,20 @@ class TestGLSARGretl(object):
         [-0.613997,     0.293619,    -2.091,    0.0378, -1.19300, -0.0349939]]) # **
 
         result_gretl_g1 = dict(
-                    endog_mean = ("Mean dependent var",   3.257395),
-                    endog_std = ("S.D. dependent var",   18.73915),
-                    ssr = ("Sum squared resid",    22799.68),
-                    mse_resid_sqrt = ("S.E. of regression",   10.70380),
-                    rsquared = ("R-squared",            0.676978),
-                    rsquared_adj = ("Adjusted R-squared",   0.673731),
-                    fvalue = ("F(2, 199)",            90.79971),
-                    f_pvalue = ("P-value(F)",           9.53e-29),
-                    llf = ("Log-likelihood",      -763.9752),
-                    aic = ("Akaike criterion",     1533.950),
-                    bic = ("Schwarz criterion",    1543.875),
-                    hqic = ("Hannan-Quinn",         1537.966),
-                    resid_acf1 = ("rho",                 -0.107341),
-                    dw = ("Durbin-Watson",        2.213805))
+                    endog_mean=("Mean dependent var",   3.257395),
+                    endog_std=("S.D. dependent var",   18.73915),
+                    ssr=("Sum squared resid",    22799.68),
+                    mse_resid_sqrt=("S.E. of regression",   10.70380),
+                    rsquared=("R-squared",            0.676978),
+                    rsquared_adj=("Adjusted R-squared",   0.673731),
+                    fvalue=("F(2, 199)",            90.79971),
+                    f_pvalue=("P-value(F)",           9.53e-29),
+                    llf=("Log-likelihood",      -763.9752),
+                    aic=("Akaike criterion",     1533.950),
+                    bic=("Schwarz criterion",    1543.875),
+                    hqic=("Hannan-Quinn",         1537.966),
+                    resid_acf1=("rho",                 -0.107341),
+                    dw=("Durbin-Watson",        2.213805))
 
         linear_logs = [1.68351, 0.430953, 2, "chi2"]
         #for logs: dropping 70 nan or incomplete observations, T=133

@@ -88,7 +88,7 @@ modp = MyT(data_endog, data_exog)
 modp.start_value = np.ones(data_exog.shape[1]+2)
 modp.start_value[-2] = 10
 modp.start_params = modp.start_value
-resp = modp.fit(start_params = modp.start_value)
+resp = modp.fit(start_params=modp.start_value)
 print(resp.params)
 print(resp.bse)
 

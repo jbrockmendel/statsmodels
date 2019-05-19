@@ -161,7 +161,7 @@ class QuantReg(RegressionModel):
         diff = 10
         cycle = False
 
-        history = dict(params = [], mse=[])
+        history = dict(params=[], mse=[])
         while n_iter < max_iter and diff > p_tol and not cycle:
             n_iter += 1
             beta0 = beta

@@ -907,7 +907,8 @@ def linear_harvey_collier(res):
 
     return stats.ttest_1samp(rr[3][3:], 0)
 
-def linear_rainbow(res, frac = 0.5):
+
+def linear_rainbow(res, frac=0.5):
     '''Rainbow test for linearity
 
     The Null hypothesis is that the regression is correctly modelled as linear.
@@ -1360,9 +1361,10 @@ def breaks_hansen(olsresults):
     S = (s[:,:,None]*s[:,None,:]).sum(0)
     H = np.trace(np.dot(np.linalg.inv(F), S))
     crit95 = np.array([(2,1.9),(6,3.75),(15,3.75),(19,4.52)],
-                      dtype = [('nobs',int), ('crit', float)])
-    #TODO: get critical values from Bruce Hansens' 1992 paper
+                      dtype=[('nobs',int), ('crit', float)])
+    # TODO: get critical values from Bruce Hansens' 1992 paper
     return H, crit95, ft, s
+
 
 def breaks_cusumolsresid(olsresidual, ddof=0):
     '''cusum test for parameter stability based on ols residuals

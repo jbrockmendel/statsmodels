@@ -175,7 +175,7 @@ def anova2_lm_single(model, design_info, n_rows, test, pr_test, robust):
 
     names = ['sum_sq', 'df', test, pr_test]
 
-    table = DataFrame(np.zeros((n_rows, 4)), columns = names)
+    table = DataFrame(np.zeros((n_rows, 4)), columns=names)
     cov = _get_covariance(model, None)
     robust_cov = _get_covariance(model, robust)
     col_order = []
@@ -239,7 +239,7 @@ def anova3_lm_single(model, design_info, n_rows, test, pr_test, robust):
 
     names = ['sum_sq', 'df', test, pr_test]
 
-    table = DataFrame(np.zeros((n_rows, 4)), columns = names)
+    table = DataFrame(np.zeros((n_rows, 4)), columns=names)
     cov = _get_covariance(model, robust)
     col_order = []
     index = []

@@ -98,10 +98,14 @@ class CheckWeight(object):
             return None  # use SkipError instead
         resid_all = dict(zip(res2.resids_colnames, res2.resids.T))
 
-        assert_allclose(res1.resid_response, resid_all['resid_response'], atol= 1e-6, rtol=2e-6)
-        assert_allclose(res1.resid_pearson, resid_all['resid_pearson'], atol= 1e-6, rtol=2e-6)
-        assert_allclose(res1.resid_deviance, resid_all['resid_deviance'], atol= 1e-6, rtol=2e-6)
-        assert_allclose(res1.resid_working, resid_all['resid_working'], atol= 1e-6, rtol=2e-6)
+        assert_allclose(res1.resid_response, resid_all['resid_response'],
+                        atol=1e-6, rtol=2e-6)
+        assert_allclose(res1.resid_pearson, resid_all['resid_pearson'],
+                        atol=1e-6, rtol=2e-6)
+        assert_allclose(res1.resid_deviance, resid_all['resid_deviance'],
+                        atol=1e-6, rtol=2e-6)
+        assert_allclose(res1.resid_working, resid_all['resid_working'],
+                        atol=1e-6, rtol=2e-6)
         if resid_all.get('resid_anscombe') is None:
             return None
         # Stata doesn't use var_weights in anscombe residuals, it seems.
@@ -110,7 +114,10 @@ class CheckWeight(object):
             warnings.simplefilter("ignore", category=FutureWarning)
             resid_a = res1.resid_anscombe
 
-        assert_allclose(resid_a, resid_all['resid_anscombe'] * np.sqrt(res1._var_weights), atol= 1e-6, rtol=2e-6)
+        assert_allclose(
+            resid_a,
+            resid_all['resid_anscombe'] * np.sqrt(res1._var_weights),
+            atol=1e-6, rtol=2e-6)
 
     def test_compare_optimizers(self):
         res1 = self.res1

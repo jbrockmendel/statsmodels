@@ -286,7 +286,7 @@ class RamsayE(RobustNorm):
     statsmodels.robust.norms.RobustNorm
     """
 
-    def __init__(self, a = .3):
+    def __init__(self, a=.3):
         self.a = a
 
     def rho(self, z):
@@ -727,7 +727,7 @@ class TukeyBiweight(RobustNorm):
     Tukey's biweight is sometime's called bisquare.
     """
 
-    def __init__(self, c = 4.685):
+    def __init__(self, c=4.685):
         self.c = c
 
     def _subset(self, z):

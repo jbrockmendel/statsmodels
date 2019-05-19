@@ -17,7 +17,7 @@ probit_res = probit_mod.fit()
 loglike = probit_mod.loglike
 score = probit_mod.score
 mod = GenericLikelihoodModel(data.endog, data.exog*2, loglike, score)
-res = mod.fit(method="nm", maxiter = 500)
+res = mod.fit(method="nm", maxiter=500)
 
 def probitloglike(params, endog, exog):
     """
@@ -59,7 +59,7 @@ if show_error:
         return stats.norm.logpdf(self.endog, loc=xb, scale=sigma)
 
     mod_norm = GenericLikelihoodModel(datal.endog, datal.exog, loglike_norm_xb)
-    res_norm = mod_norm.fit(method="nm", maxiter = 500)
+    res_norm = mod_norm.fit(method="nm", maxiter=500)
 
     print(res_norm.params)
 
@@ -76,7 +76,7 @@ if show_error2:
                              endog=datal.endog, exog=datal.exog)
     mod_norm = GenericLikelihoodModel(datal.endog, datal.exog, model_loglike3)
     res_norm = mod_norm.fit(start_params=np.ones(datal.exog.shape[1]+1),
-                            method="nm", maxiter = 5000)
+                            method="nm", maxiter=5000)
 
     print(res_norm.params)
 
@@ -96,13 +96,14 @@ class MygMLE(GenericLikelihoodModel):
 
 mod_norm2 = MygMLE(datal.endog, datal.exog)
 #res_norm = mod_norm.fit(start_params=np.ones(datal.exog.shape[1]+1), method="nm", maxiter = 500)
-res_norm2 = mod_norm2.fit(start_params=[1.]*datal.exog.shape[1]+[1], method="nm", maxiter = 500)
+res_norm2 = mod_norm2.fit(start_params=[1.]*datal.exog.shape[1]+[1],
+                          method="nm", maxiter=500)
 np.allclose(res_norm.params, res_norm2.params)
 print(res_norm2.params)
 
 res2 = sm.OLS(datal.endog, datal.exog).fit()
 start_params = np.hstack((res2.params, np.sqrt(res2.mse_resid)))
-res_norm3 = mod_norm2.fit(start_params=start_params, method="nm", maxiter = 500,
+res_norm3 = mod_norm2.fit(start_params=start_params, method="nm", maxiter=500,
                           retall=0)
 print(start_params)
 print(res_norm3.params)

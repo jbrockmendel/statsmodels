@@ -44,7 +44,7 @@ class NdKernel(object):
     In the case of the Gaussian these are both equivalent, and the second constructiong
     is prefered.
     """
-    def __init__(self, n, kernels = None, H = None):
+    def __init__(self, n, kernels=None, H=None):
         if kernels is None:
             kernels = Gaussian()
 
@@ -116,7 +116,7 @@ class CustomKernel(object):
     # Main purpose of this is to allow custom kernels and to allow speed up
     # from finite support.
 
-    def __init__(self, shape, h = 1.0, domain = None, norm = None):
+    def __init__(self, shape, h=1.0, domain=None, norm=None):
         """
         shape should be a function taking and returning numeric type.
 
@@ -413,7 +413,7 @@ class CustomKernel(object):
 class Uniform(CustomKernel):
     def __init__(self, h=1.0):
         CustomKernel.__init__(self, shape=lambda x: 0.5 * np.ones(x.shape), h=h,
-                              domain=[-1.0, 1.0], norm = 1.0)
+                              domain=[-1.0, 1.0], norm=1.0)
         self._L2Norm = 0.5
         self._kernel_var = 1. / 3
         self._order = 2
@@ -422,7 +422,7 @@ class Uniform(CustomKernel):
 class Triangular(CustomKernel):
     def __init__(self, h=1.0):
         CustomKernel.__init__(self, shape=lambda x: 1 - abs(x), h=h,
-                              domain=[-1.0, 1.0], norm = 1.0)
+                              domain=[-1.0, 1.0], norm=1.0)
         self._L2Norm = 2.0/3.0
         self._kernel_var = 1. / 6
         self._order = 2
@@ -431,7 +431,7 @@ class Triangular(CustomKernel):
 class Epanechnikov(CustomKernel):
     def __init__(self, h=1.0):
         CustomKernel.__init__(self, shape=lambda x: 0.75*(1 - x*x), h=h,
-                              domain=[-1.0, 1.0], norm = 1.0)
+                              domain=[-1.0, 1.0], norm=1.0)
         self._L2Norm = 0.6
         self._kernel_var = 0.2
         self._order = 2
@@ -440,7 +440,7 @@ class Epanechnikov(CustomKernel):
 class Biweight(CustomKernel):
     def __init__(self, h=1.0):
         CustomKernel.__init__(self, shape=lambda x: 0.9375*(1 - x*x)**2, h=h,
-                              domain=[-1.0, 1.0], norm = 1.0)
+                              domain=[-1.0, 1.0], norm=1.0)
         self._L2Norm = 5.0/7.0
         self._kernel_var = 1. / 7
         self._order = 2
@@ -504,7 +504,7 @@ class Biweight(CustomKernel):
 class Triweight(CustomKernel):
     def __init__(self, h=1.0):
         CustomKernel.__init__(self, shape=lambda x: 1.09375*(1 - x*x)**3, h=h,
-                              domain=[-1.0, 1.0], norm = 1.0)
+                              domain=[-1.0, 1.0], norm=1.0)
         self._L2Norm = 350.0/429.0
         self._kernel_var = 1. / 9
         self._order = 2
@@ -517,8 +517,8 @@ class Gaussian(CustomKernel):
     K(u) = 1 / (sqrt(2*pi)) exp(-0.5 u**2)
     """
     def __init__(self, h=1.0):
-        CustomKernel.__init__(self, shape = lambda x: 0.3989422804014327 *
-                        np.exp(-x**2/2.0), h = h, domain = None, norm = 1.0)
+        CustomKernel.__init__(self, shape=lambda x: 0.3989422804014327 *
+                        np.exp(-x**2/2.0), h=h, domain=None, norm=1.0)
         self._L2Norm = 1.0/(2.0*np.sqrt(np.pi))
         self._kernel_var = 1.0
         self._order = 2
@@ -544,7 +544,7 @@ class Cosine(CustomKernel):
     """
     def __init__(self, h=1.0):
         CustomKernel.__init__(self, shape=lambda x: 0.78539816339744828 *
-                np.cos(np.pi/2.0 * x), h=h, domain=[-1.0, 1.0], norm = 1.0)
+                np.cos(np.pi/2.0 * x), h=h, domain=[-1.0, 1.0], norm=1.0)
         self._L2Norm = np.pi**2/16.0
         self._kernel_var = 0.1894305308612978 # = 1 - 8 / np.pi**2
         self._order = 2
@@ -560,7 +560,7 @@ class Cosine2(CustomKernel):
     """
     def __init__(self, h=1.0):
         CustomKernel.__init__(self, shape=lambda x: 1 + np.cos(2.0 * np.pi * x)
-                , h=h, domain=[-0.5, 0.5], norm = 1.0)
+                , h=h, domain=[-0.5, 0.5], norm=1.0)
         self._L2Norm = 1.5
         self._kernel_var = 0.03267274151216444  # = 1/12. - 0.5 / np.pi**2
         self._order = 2

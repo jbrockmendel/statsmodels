@@ -580,7 +580,7 @@ class TestEnsure2d(object):
     @classmethod
     def setup_class(cls):
         x = np.arange(400.0).reshape((100,4))
-        cls.df = pd.DataFrame(x, columns = ['a','b','c','d'])
+        cls.df = pd.DataFrame(x, columns=['a','b','c','d'])
         cls.series = cls.df.iloc[:,0]
         cls.ndarray = x
 

@@ -56,7 +56,8 @@ def expandarr(x,k):
         kadd = (kadd, np.shape(x)[1])
     return np.r_[np.ones(kadd)*x[0],x,np.ones(kadd)*x[-1]]
 
-def movorder(x, order = 'med', windsize=3, lag='lagged'):
+
+def movorder(x, order='med', windsize=3, lag='lagged'):
     '''moving order statistics
 
     Parameters

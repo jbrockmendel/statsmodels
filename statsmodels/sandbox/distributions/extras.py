@@ -70,8 +70,8 @@ class SkewNorm_gen(distributions.rv_continuous):
     def __init__(self):
         #super(SkewNorm_gen,self).__init__(
         distributions.rv_continuous.__init__(self,
-            name = 'Skew Normal distribution', shapes = 'alpha',
-            extradoc = ''' '''                                 )
+            name='Skew Normal distribution', shapes='alpha',
+            extradoc=''' '''                                 )
 
     def _argcheck(self, alpha):
         return 1 #(alpha >= 0)
@@ -113,8 +113,9 @@ class SkewNorm2_gen(distributions.rv_continuous):
         # 2*normpdf(x)*normcdf(alpha*x
         return 2.0/np.sqrt(2*np.pi)*np.exp(-x**2/2.0) * special.ndtr(alpha*x)
 
-skewnorm2 = SkewNorm2_gen(name = 'Skew Normal distribution', shapes = 'alpha',
-                          extradoc = '''  -inf < alpha < inf''')
+
+skewnorm2 = SkewNorm2_gen(name='Skew Normal distribution', shapes='alpha',
+                          extradoc='''  -inf < alpha < inf''')
 
 
 
@@ -127,8 +128,8 @@ class ACSkewT_gen(distributions.rv_continuous):
     def __init__(self):
         #super(SkewT_gen,self).__init__(
         distributions.rv_continuous.__init__(self,
-            name = 'Skew T distribution', shapes = 'df, alpha',
-            extradoc = '''
+            name='Skew T distribution', shapes='df, alpha',
+            extradoc='''
 Skewed T distribution by Azzalini, A. & Capitanio, A. (2003)_
 
 the pdf is given by:
@@ -400,8 +401,8 @@ class NormExpan_gen(distributions.rv_continuous):
     def __init__(self,args, **kwds):
         #todo: replace with super call
         distributions.rv_continuous.__init__(self,
-            name = 'Normal Expansion distribution', shapes = ' ',
-            extradoc = '''
+            name='Normal Expansion distribution', shapes=' ',
+            extradoc='''
         The distribution is defined as the Gram-Charlier expansion of
         the normal distribution using the first four moments. The pdf
         is given by
@@ -526,8 +527,8 @@ class Transf_gen(distributions.rv_continuous):
         self.kls = kls  #(self.u_args, self.u_kwargs)
                         # possible to freeze the underlying distribution
 
-        super(Transf_gen,self).__init__(a=a, b=b, name = name,
-                                longname = longname, extradoc = extradoc)
+        super(Transf_gen,self).__init__(a=a, b=b, name=name,
+                                        longname=longname, extradoc=extradoc)
 
     def _rvs(self, *args, **kwargs):
         self.kls._size = self._size
@@ -562,13 +563,13 @@ def identit(x):
     return x
 
 invdnormalg = Transf_gen(stats.norm, inversew, inversew_inv, decr=True, #a=-np.inf,
-                numargs = 0, name = 'discf', longname = 'normal-based discount factor',
-                extradoc = '\ndistribution of discount factor y=1/(1+x)) with x N(0.05,0.1**2)')
+                numargs=0, name='discf', longname='normal-based discount factor',
+                extradoc='\ndistribution of discount factor y=1/(1+x)) with x N(0.05,0.1**2)')
 
 lognormalg = Transf_gen(stats.norm, np.exp, np.log,
-                numargs = 2, a=0, name = 'lnnorm',
-                longname = 'Exp transformed normal',
-                extradoc = '\ndistribution of y = exp(x), with x standard normal'
+                numargs=2, a=0, name='lnnorm',
+                longname='Exp transformed normal',
+                extradoc='\ndistribution of y = exp(x), with x standard normal'
                 'precision for moment andstats is not very high, 2-3 decimals')
 
 
@@ -606,8 +607,9 @@ class ExpTransf_gen(distributions.rv_continuous):
             a = kwargs['a']
         else:
             a = 0
-        super(ExpTransf_gen,self).__init__(a=0, name = name)
+        super(ExpTransf_gen,self).__init__(a=0, name=name)
         self.kls = kls
+
     def _cdf(self,x,*args):
         pass
         #print args
@@ -637,7 +639,7 @@ class LogTransf_gen(distributions.rv_continuous):
         else:
             a = 0
 
-        super(LogTransf_gen,self).__init__(a=a, name = name)
+        super(LogTransf_gen,self).__init__(a=a, name=name)
         self.kls = kls
 
     def _cdf(self,x, *args):
@@ -730,9 +732,10 @@ class TransfTwo_gen(distributions.rv_continuous):
         self.kls = kls  #(self.u_args, self.u_kwargs)
                         # possible to freeze the underlying distribution
 
-        super(TransfTwo_gen,self).__init__(a=a, b=b, name = name,
-                                shapes = kls.shapes,
-                                longname = longname, extradoc = extradoc)
+        super(TransfTwo_gen,self).__init__(a=a, b=b, name=name,
+                                           shapes=kls.shapes,
+                                           longname=longname,
+                                           extradoc=extradoc)
 
         # add enough info for self.freeze() to be able to reconstruct the instance
         try:
@@ -812,21 +815,23 @@ class SquareFunc(object):
     def squarefunc(self, x):
         return np.power(x,2)
 
+
 sqfunc = SquareFunc()
 
 squarenormalg = TransfTwo_gen(stats.norm, sqfunc.squarefunc, sqfunc.inverseplus,
                 sqfunc.inverseminus, sqfunc.derivplus, sqfunc.derivminus,
                 shape='u', a=0.0, b=np.inf,
-                numargs = 0, name = 'squarenorm', longname = 'squared normal distribution',
-                extradoc = '\ndistribution of the square of a normal random variable' +\
-                           ' y=x**2 with x N(0.0,1)')
+                numargs=0, name='squarenorm', longname='squared normal distribution',
+                extradoc='\ndistribution of the square of a normal random variable' +\
+                         ' y=x**2 with x N(0.0,1)')
                         #u_loc=l, u_scale=s)
 squaretg = TransfTwo_gen(stats.t, sqfunc.squarefunc, sqfunc.inverseplus,
                 sqfunc.inverseminus, sqfunc.derivplus, sqfunc.derivminus,
                 shape='u', a=0.0, b=np.inf,
-                numargs = 1, name = 'squarenorm', longname = 'squared t distribution',
-                extradoc = '\ndistribution of the square of a t random variable' +\
-                           ' y=x**2 with x t(dof,0.0,1)')
+                numargs=1, name='squarenorm',
+                longname='squared t distribution',
+                extradoc='\ndistribution of the square of a t random variable' +\
+                         ' y=x**2 with x t(dof,0.0,1)')
 
 def inverseplus(x):
     return np.sqrt(-x)
@@ -847,10 +852,11 @@ def negsquarefunc(x):
 
 negsquarenormalg = TransfTwo_gen(stats.norm, negsquarefunc, inverseplus, inverseminus,
                 derivplus, derivminus, shape='hump', a=-np.inf, b=0.0,
-                numargs = 0, name = 'negsquarenorm', longname = 'negative squared normal distribution',
-                extradoc = '\ndistribution of the negative square of a normal random variable' +\
-                           ' y=-x**2 with x N(0.0,1)')
+                numargs=0, name='negsquarenorm', longname='negative squared normal distribution',
+                extradoc='\ndistribution of the negative square of a normal random variable' +\
+                         ' y=-x**2 with x N(0.0,1)')
                         #u_loc=l, u_scale=s)
+
 
 def inverseplus(x):
     return x
@@ -870,9 +876,10 @@ def absfunc(x):
 
 absnormalg = TransfTwo_gen(stats.norm, np.abs, inverseplus, inverseminus,
                 derivplus, derivminus, shape='u', a=0.0, b=np.inf,
-                numargs = 0, name = 'absnorm', longname = 'absolute of normal distribution',
-                extradoc = '\ndistribution of the absolute value of a normal random variable' +\
-                           ' y=abs(x) with x N(0,1)')
+                numargs=0, name='absnorm',
+                longname='absolute of normal distribution',
+                extradoc='\ndistribution of the absolute value of a normal random variable' +\
+                         ' y=abs(x) with x N(0,1)')
 
 
 #copied from mvncdf.py

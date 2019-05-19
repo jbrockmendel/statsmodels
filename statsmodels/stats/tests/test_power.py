@@ -91,7 +91,7 @@ class CheckPowerMixin(object):
         fig = plt.figure()
         ax = fig.add_subplot(2,1,1)
         fig = self.cls().plot_power(dep_var='nobs',
-                                  nobs= np.arange(2, 100),
+                                  nobs=np.arange(2, 100),
                                   effect_size=np.array([0.1, 0.2, 0.3, 0.5, 1]),
                                   #alternative='larger',
                                   ax=ax, title='Power of t-Test',

@@ -523,11 +523,11 @@ class MLEInfluence(_BaseInfluenceMixin):
 
         # grab the results
         summary_data = DataFrame(dict(
-                            cooks_d = self.cooks_distance[0],
-                            standard_resid = self.resid_studentized,
-                            hat_diag = self.hat_matrix_diag,
-                            dffits_internal = self.d_fittedvalues_scaled),
-                            index = row_labels)
+                            cooks_d=self.cooks_distance[0],
+                            standard_resid=self.resid_studentized,
+                            hat_diag=self.hat_matrix_diag,
+                            dffits_internal=self.d_fittedvalues_scaled),
+                            index=row_labels)
         #NOTE: if we don't give columns, order of above will be arbitrary
         dfbeta = DataFrame(self.dfbetas, columns=beta_labels,
                             index=row_labels)
@@ -985,14 +985,14 @@ class OLSInfluence(_BaseInfluenceMixin):
 
         # grab the results
         summary_data = DataFrame(dict(
-                            cooks_d = self.cooks_distance[0],
-                            standard_resid = self.resid_studentized_internal,
-                            hat_diag = self.hat_matrix_diag,
-                            dffits_internal = self.dffits_internal[0],
-                            student_resid = self.resid_studentized_external,
-                            dffits = self.dffits[0],
+                            cooks_d=self.cooks_distance[0],
+                            standard_resid=self.resid_studentized_internal,
+                            hat_diag=self.hat_matrix_diag,
+                            dffits_internal=self.dffits_internal[0],
+                            student_resid=self.resid_studentized_external,
+                            dffits=self.dffits[0],
                                         ),
-                            index = row_labels)
+                            index=row_labels)
         #NOTE: if we don't give columns, order of above will be arbitrary
         dfbeta = DataFrame(self.dfbetas, columns=beta_labels,
                             index=row_labels)

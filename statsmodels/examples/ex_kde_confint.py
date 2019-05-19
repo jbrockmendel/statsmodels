@@ -17,7 +17,7 @@ from statsmodels.distributions.mixture_rvs import mixture_rvs
 # example from test_kde.py mixture of two normal distributions
 np.random.seed(12345)
 x = mixture_rvs([.25,.75], size=200, dist=[stats.norm, stats.norm],
-                kwargs = (dict(loc=-1, scale=.5),dict(loc=1, scale=.5)))
+                kwargs=(dict(loc=-1, scale=.5), dict(loc=1, scale=.5)))
 
 x.sort() # not needed
 

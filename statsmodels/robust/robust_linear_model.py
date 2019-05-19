@@ -256,17 +256,17 @@ class RLM(base.LikelihoodModel):
         if not init:
             self.scale = self._estimate_scale(wls_results.resid)
 
-        history = dict(params = [np.inf], scale = [])
+        history = dict(params=[np.inf], scale=[])
         if conv == 'coefs':
             criterion = history['params']
         elif conv == 'dev':
-            history.update(dict(deviance = [np.inf]))
+            history.update(dict(deviance=[np.inf]))
             criterion = history['deviance']
         elif conv == 'sresid':
-            history.update(dict(sresid = [np.inf]))
+            history.update(dict(sresid=[np.inf]))
             criterion = history['sresid']
         elif conv == 'weights':
-            history.update(dict(weights = [np.inf]))
+            history.update(dict(weights=[np.inf]))
             criterion = history['weights']
 
         # done one iteration so update

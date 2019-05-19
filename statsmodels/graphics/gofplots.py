@@ -177,7 +177,7 @@ class ProbPlot(object):
             self.scale = self.fit_params[-1]
             if len(self.fit_params) > 2:
                 self.dist = dist(*self.fit_params[:-2],
-                                 **dict(loc = 0, scale = 1))
+                                 **dict(loc=0, scale=1))
             else:
                 self.dist = dist(loc=0, scale=1)
         elif distargs or loc == 0 or scale == 1:

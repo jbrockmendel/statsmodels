@@ -451,7 +451,7 @@ class TestProbitMinimizeDefault(CheckBinaryResults):
         res2 = Spector.probit
         cls.res2 = res2
         fit = Probit(data.endog, data.exog).fit
-        cls.res1 = fit(method="minimize", disp=0, niter=5, tol = 1e-8)
+        cls.res1 = fit(method="minimize", disp=0, niter=5, tol=1e-8)
 
 
 class TestProbitMinimizeDogleg(CheckBinaryResults):
@@ -463,8 +463,8 @@ class TestProbitMinimizeDogleg(CheckBinaryResults):
         res2 = Spector.probit
         cls.res2 = res2
         fit = Probit(data.endog, data.exog).fit
-        cls.res1 = fit(method="minimize", disp=0, niter=5, tol = 1e-8,
-                       min_method = 'dogleg')
+        cls.res1 = fit(method="minimize", disp=0, niter=5, tol=1e-8,
+                       min_method='dogleg')
 
 
 class TestProbitMinimizeAdditionalOptions(CheckBinaryResults):

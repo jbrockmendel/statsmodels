@@ -127,12 +127,12 @@ else:
     modp.fixed_paramsmask = None
 
 
-resp = modp.fit(start_params = modp.start_params, disp=1, method='nm')#'newton')
+resp = modp.fit(start_params=modp.start_params, disp=1, method='nm')
 #resp = modp.fit(start_params = modp.start_params, disp=1, method='newton')
 print('\nestimation results t-dist')
 print(resp.params)
 print(resp.bse)
-resp2 = modp.fit(start_params = resp.params, method='Newton')
+resp2 = modp.fit(start_params=resp.params, method='Newton')
 print('using Newton')
 print(resp2.params)
 print(resp2.bse)

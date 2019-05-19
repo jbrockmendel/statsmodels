@@ -108,7 +108,7 @@ class TestFForm(object):
         for j in range(self.nboot):
             u_boot = u2.copy()
 
-            prob = np.random.uniform(0,1, size = (n,))
+            prob = np.random.uniform(0, 1, size=(n,))
             ind = prob < r
             u_boot[ind] = u1[ind]
             Y_boot = m + u_boot

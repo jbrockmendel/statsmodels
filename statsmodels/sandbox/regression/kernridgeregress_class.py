@@ -58,7 +58,7 @@ class GaussProcess(object):
     '''
 
     def __init__(self, x, y=None, kernel=kernel_rbf,
-                 scale=0.5, ridgecoeff = 1e-10, **kwds ):
+                 scale=0.5, ridgecoeff=1e-10, **kwds):
         '''
         Parameters
         ----------

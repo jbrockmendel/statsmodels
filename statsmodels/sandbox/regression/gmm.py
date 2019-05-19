@@ -698,12 +698,12 @@ class GMM(Model):
         # check that we have the right number of xnames
         self._fix_param_names(params, param_names=None)
         results = results_class_dict[self.results_class](
-                                        model = self,
-                                        params = params,
-                                        weights = weights,
-                                        wargs = wargs,
-                                        options_other = options_other,
-                                        optim_args = optim_args)
+                                        model=self,
+                                        params=params,
+                                        weights=weights,
+                                        wargs=wargs,
+                                        options_other=options_other,
+                                        optim_args=optim_args)
 
         self.results = results # FIXME: remove, still keeping it temporarily
         return results

@@ -626,11 +626,12 @@ class MultinomialModel(BinaryModel):
             start_params = np.zeros((self.K * (self.J-1)))
         else:
             start_params = np.asarray(start_params)
-        callback = lambda x : None # placeholder until check_perfect_pred
+        callback = lambda x : None  # placeholder until check_perfect_pred
         # skip calling super to handle results from LikelihoodModel
-        mnfit = base.LikelihoodModel.fit(self, start_params = start_params,
-                method=method, maxiter=maxiter, full_output=full_output,
-                disp=disp, callback=callback, **kwargs)
+        mnfit = base.LikelihoodModel.fit(
+            self, start_params=start_params,
+            method=method, maxiter=maxiter, full_output=full_output,
+            disp=disp, callback=callback, **kwargs)
         mnfit.params = mnfit.params.reshape(self.K, -1, order='F')
         mnfit = MultinomialResults(self, mnfit)
         return MultinomialResultsWrapper(mnfit)
@@ -1338,11 +1339,11 @@ class GeneralizedPoisson(CountModel):
 
     """ + base._missing_param_doc}
 
-    def __init__(self, endog, exog, p = 1, offset=None,
-                       exposure=None, missing='none', **kwargs):
+    def __init__(self, endog, exog, p=1, offset=None,
+                 exposure=None, missing='none', **kwargs):
         super(GeneralizedPoisson, self).__init__(endog, exog, offset=offset,
-                                               exposure=exposure,
-                                               missing=missing, **kwargs)
+                                                 exposure=exposure,
+                                                 missing=missing, **kwargs)
         self.parameterization = p - 1
         self.exog_names.append('alpha')
         self.k_extra = 1
@@ -1439,7 +1440,7 @@ class GeneralizedPoisson(CountModel):
         return a
 
     def fit(self, start_params=None, method='bfgs', maxiter=35,
-            full_output=1, disp=1, callback=None, use_transparams = False,
+            full_output=1, disp=1, callback=None, use_transparams=False,
             cov_type='nonrobust', cov_kwds=None, use_t=None, **kwargs):
         """
         Parameters
@@ -3192,7 +3193,7 @@ class NegativeBinomialP(CountModel):
         return a
 
     def fit(self, start_params=None, method='bfgs', maxiter=35,
-            full_output=1, disp=1, callback=None, use_transparams = False,
+            full_output=1, disp=1, callback=None, use_transparams=False,
             cov_type='nonrobust', cov_kwds=None, use_t=None, **kwargs):
         """
         Parameters

@@ -231,7 +231,7 @@ class TestKDEMultivariate(KDETestBase):
         #                  defaults=nparam.EstimatorSettings(efficient=False))
         #bw = dens.bw
         bw = np.array([0.4471, 0.2861])
-        npt.assert_allclose(bw, dens_efficient.bw, atol=0.1, rtol = 0.2)
+        npt.assert_allclose(bw, dens_efficient.bw, atol=0.1, rtol=0.2)
 
     @pytest.mark.slow
     def test_efficient_notrandom(self):
@@ -246,7 +246,7 @@ class TestKDEMultivariate(KDETestBase):
                                                           randomize=False,
                                                           n_sub=100))
         dens = nparam.KDEMultivariate(data=[Y, C1], var_type='cc', bw='cv_ml')
-        npt.assert_allclose(dens.bw, dens_efficient.bw, atol=0.1, rtol = 0.2)
+        npt.assert_allclose(dens.bw, dens_efficient.bw, atol=0.1, rtol=0.2)
 
     def test_efficient_user_specified_bw(self):
         nobs = 400

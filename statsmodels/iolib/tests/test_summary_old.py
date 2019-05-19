@@ -42,8 +42,8 @@ def _est_regression_summary():
 | AIC criterion:                  233.2   Skew:                      0.4200  |
 | BIC criterion:                  238.6   Kurtosis:                   2.434  |
 ------------------------------------------------------------------------------'''
-).substitute(XXcurrentXdateXX = str(time.strftime("%a, %d %b %Y",t)),
-             XXtimeXXX = str(time.strftime("%H:%M:%S",t)))
+).substitute(XXcurrentXdateXX=str(time.strftime("%a, %d %b %Y",t)),
+             XXtimeXXX=str(time.strftime("%H:%M:%S",t)))
     desired = str(desired)
     aregression = TestOLS()
     TestOLS.setup_class()

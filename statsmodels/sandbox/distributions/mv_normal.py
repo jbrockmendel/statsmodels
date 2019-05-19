@@ -1237,15 +1237,15 @@ if __name__ == '__main__':
 
         #as asserts
         r_val = [-7.667977543898155, -6.917977543898155, -5.167977543898155]
-        assert_array_almost_equal( mvn3.logpdf(cov3), r_val, decimal = 14)
+        assert_array_almost_equal(mvn3.logpdf(cov3), r_val, decimal=14)
         #decimal 18
         r_val = [0.000467562492721686, 0.000989829804859273, 0.005696077243833402]
-        assert_array_almost_equal( mvn3.pdf(cov3), r_val, decimal = 17)
+        assert_array_almost_equal(mvn3.pdf(cov3), r_val, decimal=17)
         #cheating new mean, same cov, too dangerous, got wrong instance in tests
         #mvn3.mean = np.array([0,0,0])
         mvn3c = MVNormal(np.array([0,0,0]), cov3)
         r_val = [0.02914269740502042, 0.02269635555984291, 0.01767593948287269]
-        assert_array_almost_equal( mvn3c.pdf(cov3), r_val, decimal = 16)
+        assert_array_almost_equal(mvn3c.pdf(cov3), r_val, decimal=16)
 
         mvn3b = MVNormal((0,0,0), 1)
         fun = lambda x : np.log(mvn3.pdf(x)) - np.log(mvn3b.pdf(x))

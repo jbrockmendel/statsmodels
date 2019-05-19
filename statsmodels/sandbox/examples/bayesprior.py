@@ -47,7 +47,7 @@ class igamma_gen(rv_continuous):
             raise ValueError("Problem with integration.  Returned nan.")
 
 igamma = igamma_gen(a=0.0, name='invgamma', longname="An inverted gamma",
-            shapes = 'a,b', extradoc="""
+                    shapes='a,b', extradoc="""
 
 Inverted gamma distribution
 
@@ -164,7 +164,7 @@ fsp.axis([-20,20,0,1])
 fsp = fig.add_subplot(223)
 fsp.scatter(y1y2pairsp1[:,0], y1y2pairsp1[:,1], color='b', marker='o',
     facecolor='none')
-fsp.scatter(y1y2[:,0], y1y2[:,1], color ='g', marker='+')
+fsp.scatter(y1y2[:, 0], y1y2[:, 1], color='g', marker='+')
 fsp.set_title('Model 1 vs. Model 2 (P1)')
 fsp.set_ylabel('Y(2)')
 fsp.set_xlabel('Y(1)')

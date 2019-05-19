@@ -210,7 +210,7 @@ def check_constraint(da, va, ga):
 
 
 def gen_gendat_ar0(ar):
-    def gendat_ar0(msg = False):
+    def gendat_ar0(msg=False):
         ars = AR_simulator()
         ars.ngroups = 200
         ars.params = np.r_[0, -1, 1, 0, 0.5]

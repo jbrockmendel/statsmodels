@@ -812,7 +812,7 @@ class AR(LikelihoodModel):
                 self.params, self.llf = retval[0:2]
             if method == 'tnc':
                 retval = optimize.fmin_tnc(minfunc, start_params,
-                        approx_grad=True, bounds = bounds)
+                                           approx_grad=True, bounds=bounds)
                 self.params = retval[0]
             if method == 'powell':
                 retval = optimize.fmin_powell(minfunc,start_params)
@@ -1329,7 +1329,7 @@ if __name__ == '__main__':
         from rpy import r
         f = r.formula('~garch(1, 1)')
         #fit = r.garchFit(f, data = errgjr4)
-        x = r.garchSim( n = 500)
+        x = r.garchSim(n=500)
         print('R acf', tsa.acf(np.power(x,2))[:15])
         arma3 = Arma(np.power(x,2))
         arma3res = arma3.fit(start_params=[-0.2,0.1,0.5],maxiter=5000)
@@ -1342,7 +1342,7 @@ if __name__ == '__main__':
     print(llf[0])
 
     erro,ho, etaxo = generate_gjrgarch(20, ar, ma, mu=0.04, scale=0.01,
-                      varinnovation = np.ones(20))
+                                       varinnovation=np.ones(20))
 
 
     ''' this looks relatively good

@@ -119,8 +119,8 @@ cyl_labels = np.array(['USA', 'USA', 'USA', 'USA', 'USA', 'USA', 'USA', 'USA', '
     'USA', 'USA', 'USA', 'Japan', 'USA', 'USA', 'USA', 'Germany', 'USA', 'USA', 'USA'])
 
 dta = np.recfromtxt(StringIO(ss), names=("Rust","Brand","Replication"))
-dta2 = np.recfromtxt(StringIO(ss2), names = ("idx", "Treatment", "StressReduction"))
-dta3 = np.recfromtxt(StringIO(ss3), names = ("Brand", "Relief"))
+dta2 = np.recfromtxt(StringIO(ss2), names=("idx", "Treatment", "StressReduction"))
+dta3 = np.recfromtxt(StringIO(ss3), names=("Brand", "Relief"))
 
 from statsmodels.sandbox.stats.multicomp import tukeyhsd
 import statsmodels.sandbox.stats.multicomp as multi
@@ -208,7 +208,9 @@ ss5 = '''\
 1 - 2	-4.600	-8.249	-0.951	***
 1 - 3	-0.260	-3.909	3.389	'''
 
-dta5 = np.recfromtxt(StringIO(ss5), names = ('pair', 'mean', 'lower', 'upper', 'sig'), delimiter='\t')
+dta5 = np.recfromtxt(StringIO(ss5),
+                     names=('pair', 'mean', 'lower', 'upper', 'sig'),
+                     delimiter='\t')
 
 sas_ = dta5[[1,3,2]]
 confint1 = res3.confint

@@ -628,11 +628,11 @@ class TestOLSRobustClusterNWPGroupsFit(CheckOLSRobustCluster, CheckOLSRobustNewM
 
     def setup(self):
         res_ols = self.res1.model.fit(cov_type='nw-panel',
-                                      cov_kwds = dict(groups=self.groups,
-                                                      maxlags=4,
-                                                      use_correction='hac',
-                                                      use_t=True,
-                                                      df_correction=False))
+                                      cov_kwds=dict(groups=self.groups,
+                                                    maxlags=4,
+                                                    use_correction='hac',
+                                                    use_t=True,
+                                                    df_correction=False))
         self.res3 = self.res1
         self.res1 = res_ols
         self.bse_robust = res_ols.bse

@@ -162,7 +162,7 @@ class JumpDiffusionKou(object):
 
         T=ts[-1]
         # simulate number of jumps
-        N = np.random.poisson(lambd*T,size =(nrepl,1))
+        N = np.random.poisson(lambd*T, size=(nrepl, 1))
 
         jumps=[]
         nobs=len(ts)

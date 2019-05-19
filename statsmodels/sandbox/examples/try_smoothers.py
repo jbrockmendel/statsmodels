@@ -25,8 +25,7 @@ if __name__ == "__main__":
     y = np.sin(x*5)/x + 2*x + sig_fac * (3+x)*np.random.normal(size=nobs)
 
     K = kernels.Biweight(0.25)
-    K2 = kernels.CustomKernel(lambda x: (1 - x*x)**2, 0.25, domain = [-1.0,
-                               1.0])
+    K2 = kernels.CustomKernel(lambda x: (1 - x*x)**2, 0.25, domain=[-1.0, 1.0])
 
     KS = smoothers.KernelSmoother(x, y, K)
     KS2 = smoothers.KernelSmoother(x, y, K2)

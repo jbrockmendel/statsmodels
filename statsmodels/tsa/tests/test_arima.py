@@ -655,9 +655,9 @@ class Test_ARIMA112CSS(CheckArimaResultsMixin):
     @classmethod
     def setup_class(cls):
         cpi = load_macrodata_pandas().data['cpi'].values
+        start_params = [.905322, -.692425, 1.07366, 0.172024]
         cls.res1 = ARIMA(cpi, (1,1,2)).fit(disp=-1, method='css',
-                                start_params = [.905322, -.692425, 1.07366,
-                                                0.172024])
+                                           start_params=start_params)
         cls.res2 = results_arima.ARIMA112(method='css')
         cls.res2.fittedvalues = - cpi[1:-1] + cls.res2.linear
         # make sure endog names changes to D.cpi

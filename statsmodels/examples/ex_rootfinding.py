@@ -64,9 +64,9 @@ if __name__ == '__main__':
         # both bounds
         # hits maxiter in brentq if bounds too wide
         print(brentq_expanding(func, args=(500000,), low=300000, upp=700000))
-        print(brentq_expanding(func, args=(-50000,), low= -70000, upp=-1000))
+        print(brentq_expanding(func, args=(-50000,), low=-70000, upp=-1000))
         print(brentq_expanding(funcn, args=(500000,), low=300000, upp=700000))
-        print(brentq_expanding(funcn, args=(-50000,), low= -70000, upp=-10000))
+        print(brentq_expanding(funcn, args=(-50000,), low=-70000, upp=-10000))
 
         print(brentq_expanding(func, args=(1.234e30,), xtol=1e10,
                                increasing=True, maxiter_bq=200))
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     '''
 
     try:
-        print(brentq_expanding(funcn, args=(-50000,), low= -40000, upp=-10000))
+        print(brentq_expanding(funcn, args=(-50000,), low=-40000, upp=-10000))
     except Exception as e:
         print(e)
 

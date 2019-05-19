@@ -94,7 +94,7 @@ def _iscount(X):
     array([0, 3, 4])
     """
     X = np.asarray(X)
-    remainder = np.logical_and(np.logical_and(np.all(X % 1. == 0, axis = 0),
+    remainder = np.logical_and(np.logical_and(np.all(X % 1. == 0, axis=0),
                                X.var(0) != 0), np.all(X >= 0, axis=0))
     dummy = _isdummy(X)
     remainder = np.where(remainder)[0].tolist()

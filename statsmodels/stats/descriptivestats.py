@@ -91,31 +91,31 @@ class Describe(object):
         # Second position is the tuple/list of column names/numbers
         # third is are the results in order of the columns
         self.univariate = dict(
-            obs = [len, None, None],
-            mean = [np.mean, None, None],
-            std = [np.std, None, None],
-            min = [np.min, None, None],
-            max = [np.max, None, None],
-            ptp = [np.ptp, None, None],
-            var = [np.var, None, None],
-            mode_val = [self._mode_val, None, None],
-            mode_bin = [self._mode_bin, None, None],
-            median = [np.median, None, None],
-            skew = [stats.skew, None, None],
-            uss = [lambda x: np.sum(np.asarray(x)**2, axis=0), None, None],
-            kurtosis = [stats.kurtosis, None, None],
-            percentiles = [self._percentiles, None, None],
+            obs=[len, None, None],
+            mean=[np.mean, None, None],
+            std=[np.std, None, None],
+            min=[np.min, None, None],
+            max=[np.max, None, None],
+            ptp=[np.ptp, None, None],
+            var=[np.var, None, None],
+            mode_val=[self._mode_val, None, None],
+            mode_bin=[self._mode_bin, None, None],
+            median=[np.median, None, None],
+            skew=[stats.skew, None, None],
+            uss=[lambda x: np.sum(np.asarray(x)**2, axis=0), None, None],
+            kurtosis=[stats.kurtosis, None, None],
+            percentiles=[self._percentiles, None, None],
             #BUG: not single value
-            #sign_test_M = [self.sign_test_m, None, None],
-            #sign_test_P = [self.sign_test_p, None, None]
+            #sign_test_M=[self.sign_test_m, None, None],
+            #sign_test_P=[self.sign_test_p, None, None]
         )
 
         # TODO: Basic stats for strings
-        # self.strings = dict(
-        #    unique = [np.unique, None, None],
-        #    number_uniq = [len(
-        #    most = [
-        #    least = [
+        # self.strings=dict(
+        #    unique=[np.unique, None, None],
+        #    number_uniq=[len(
+        #    most=[
+        #    least=[
 
         #TODO: Multivariate
         # self.multivariate = dict(
@@ -290,15 +290,14 @@ class Describe(object):
             data = lmap(lambda *row: list(row), *data)
             header, stubs = stubs, header
 
-        part_fmt = dict(data_fmts = ["%#8.4g"]*(len(header)-1))
+        part_fmt = dict(data_fmts=["%#8.4g"]*(len(header)-1))
         table = SimpleTable(data,
                             header,
                             stubs,
                             title=title,
-                            txt_fmt = part_fmt)
+                            txt_fmt=part_fmt)
 
         return table
-
 
     def sign_test(self, samp, mu0=0):
         return sign_test(samp, mu0)
@@ -333,12 +332,12 @@ if __name__ == "__main__":
     data1 = np.array([(1,2,'a','aa'),
                       (2,3,'b','bb'),
                       (2,4,'b','cc')],
-                     dtype = [('alpha',float), ('beta', int),
-                              ('gamma', '|S1'), ('delta', '|S2')])
+                     dtype=[('alpha',float), ('beta', int),
+                            ('gamma', '|S1'), ('delta', '|S2')])
     data2 = np.array([(1,2),
                       (2,3),
                       (2,4)],
-                     dtype = [('alpha',float), ('beta', float)])
+                     dtype=[('alpha',float), ('beta', float)])
 
     data3 = np.array([[1,2,4,4],
                       [2,3,3,3],

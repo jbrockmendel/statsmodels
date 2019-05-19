@@ -227,8 +227,8 @@ class TestTheilLinRestriction(CheckEquivalenceMixin):
         #merge var1 and var2
         x2 = x[:, :2].copy()
         x2[:, 1] += x[:, 2]
-        #mod1 = TheilGLS(y, x, r_matrix =[[0, 1, -1, 0, 0]])
-        mod1 = TheilGLS(y, x[:, :3], r_matrix =[[0, 1, -1]])
+        #mod1 = TheilGLS(y, x, r_matrix=[[0, 1, -1, 0, 0]])
+        mod1 = TheilGLS(y, x[:, :3], r_matrix=[[0, 1, -1]])
         cls.res1 = mod1.fit(200000)
         cls.res2 = OLS(y, x2).fit()
 
@@ -248,8 +248,8 @@ class TestTheilLinRestrictionApprox(CheckEquivalenceMixin):
         #merge var1 and var2
         x2 = x[:, :2].copy()
         x2[:, 1] += x[:, 2]
-        #mod1 = TheilGLS(y, x, r_matrix =[[0, 1, -1, 0, 0]])
-        mod1 = TheilGLS(y, x[:, :3], r_matrix =[[0, 1, -1]])
+        #mod1 = TheilGLS(y, x, r_matrix=[[0, 1, -1, 0, 0]])
+        mod1 = TheilGLS(y, x[:, :3], r_matrix=[[0, 1, -1]])
         cls.res1 = mod1.fit(100)
         cls.res2 = OLS(y, x2).fit()
 

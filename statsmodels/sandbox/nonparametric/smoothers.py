@@ -29,7 +29,7 @@ class KernelSmoother(object):
     y - array_like of y values
     Kernel - Kernel object, Default is Gaussian.
     """
-    def __init__(self, x, y, Kernel = None):
+    def __init__(self, x, y, Kernel=None):
         if Kernel is None:
             Kernel = kernels.Gaussian()
         self.Kernel = Kernel

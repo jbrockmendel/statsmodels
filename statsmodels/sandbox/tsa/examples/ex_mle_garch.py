@@ -197,13 +197,13 @@ if 'rpyfit' in examples:
     from rpy import r
     r.library('fGarch')
     f = r.formula('~garch(1, 1)')
-    fit = r.garchFit(f, data = errgjr4-errgjr4.mean(), include_mean=False)
+    fit = r.garchFit(f, data=errgjr4-errgjr4.mean(), include_mean=False)
 
 if 'rpysim' in examples:
     from rpy import r
     f = r.formula('~garch(1, 1)')
     #fit = r.garchFit(f, data = errgjr4)
-    x = r.garchSim( n = 500)
+    x = r.garchSim(n=500)
     print('R acf', tsa.acf(np.power(x,2))[:15])
     arma3 = Arma(np.power(x,2))
     arma3res = arma3.fit(start_params=[-0.2,0.1,0.5],maxiter=5000)
@@ -212,7 +212,7 @@ if 'rpysim' in examples:
     arma3bres = arma3b.fit(start_params=[-0.2,0.1,0.5],maxiter=5000, method='bfgs')
     print(arma3bres.params)
 
-    xr = r.garchSim( n = 100)
+    xr = r.garchSim(n=100)
 
     x = np.asarray(xr)
     ggmod = Garch(x-x.mean())
@@ -228,7 +228,7 @@ if 'rpysim' in examples:
     print(llf[0])
 
     garchplot(ggmod.errorsest, ggmod.h, title='Garch estimated')
-    fit = r.garchFit(f, data = x-x.mean(), include_mean=False, trace=False)
+    fit = r.garchFit(f, data=x-x.mean(), include_mean=False, trace=False)
     print(r.summary(fit))
 
 '''based on R default simulation
@@ -314,7 +314,7 @@ Final Estimate:
 
 
 erro,ho, etaxo = generate_gjrgarch(20, ar, ma, mu=0.04, scale=0.01,
-                  varinnovation = np.ones(20))
+                                   varinnovation=np.ones(20))
 
 if 'sp500' in examples:
     import tabular as tb

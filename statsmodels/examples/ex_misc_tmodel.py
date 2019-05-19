@@ -57,14 +57,14 @@ else:
 
 print('\nResults with TLinearModel')
 print('-------------------------')
-resp = modp.fit(start_params = modp.start_params, disp=1, method='nm',
-                maxfun=10000, maxiter=5000)#'newton')
+resp = modp.fit(start_params=modp.start_params, disp=1, method='nm',
+                maxfun=10000, maxiter=5000)
 #resp = modp.fit(start_params = modp.start_params, disp=1, method='newton')
 
 print('using Nelder-Mead')
 print(resp.params)
 print(resp.bse)
-resp2 = modp.fit(start_params = resp.params, method='Newton')
+resp2 = modp.fit(start_params=resp.params, method='Newton')
 print('using Newton')
 print(resp2.params)
 print(resp2.bse)

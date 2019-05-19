@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
         for i in range(resparams.shape[1]):
             plt.subplot(4, 2, i+1)
-            plt.hist(resparams[:,i], bins = 10)
+            plt.hist(resparams[:, i], bins=10)
             #plt.title("Leave2out parameter estimates")
         plt.show()
 
