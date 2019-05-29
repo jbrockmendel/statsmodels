@@ -2871,7 +2871,7 @@ class NegativeBinomial(CountModel):
                         maxiter=maxiter, method=method, disp=disp,
                         full_output=full_output, callback=callback,
                         **kwargs)
-                        # TODO: Fix NBin _check_perfect_pred
+        # TODO: Fix NBin _check_perfect_pred
         if self.loglike_method.startswith('nb'):
             # mlefit is a wrapped counts results
             self._transparams = False # don't need to transform anymore now

@@ -103,7 +103,7 @@ exogenous variables.  Got length %s" % len(sys))
 #        exog = np.zeros((M,M), dtype=object)
 #        for i,eq in enumerate(sys[1::2]):
 #            exog[i,i] = np.asarray(eq)  # not sure this exog is needed
-                                        # used to compute resids for now
+        #                                # used to compute resids for now
         exog = np.column_stack(np.asarray(sys[1::2][i]) for i in range(M))
 #       exog = np.vstack(np.asarray(sys[1::2][i]) for i in range(M))
         self.exog = exog # 2d ndarray exog is better

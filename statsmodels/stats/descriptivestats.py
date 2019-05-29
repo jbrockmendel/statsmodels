@@ -306,9 +306,9 @@ class Describe(object):
     #TODO: There must be a better way but formating the stats of a fuction that
     #      returns 2 values is a problem.
     #def sign_test_m(samp,mu0=0):
-        #return self.sign_test(samp,mu0)[0]
+    #    #return self.sign_test(samp,mu0)[0]
     #def sign_test_p(samp,mu0=0):
-        #return self.sign_test(samp,mu0)[1]
+    #    #return self.sign_test(samp,mu0)[1]
 
 if __name__ == "__main__":
     #unittest.main()
