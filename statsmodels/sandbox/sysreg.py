@@ -312,7 +312,6 @@ exogenous variables.  Got length %s" % len(sys))
             try:
                 iter(indep_endog[eq_key])
             except:
-#                eq_key = [eq_key]
                 raise TypeError("The values of the indep_exog dict must be "
                                 "iterable. Got type %s for converter %s"
                                 % (type(indep_endog[eq_key]), eq_key))

@@ -255,21 +255,18 @@ class NonlinearLS(Model):  #or subclass a model
 class Myfunc(NonlinearLS):
 
     #predict model.Model has a different signature
-##    def predict(self, params, exog=None):
-##        if not exog is None:
-##            x = exog
-##        else:
-##            x = self.exog
-##        a, b, c = params
-##        return a*np.exp(-b*x) + c
+    #def predict(self, params, exog=None):
+    #    if not exog is None:
+    #        x = exog
+    #    else:
+    #        x = self.exog
+    #    a, b, c = params
+    #    return a*np.exp(-b*x) + c
 
     def _predict(self, params):
         x = self.exog
         a, b, c = params
         return a*np.exp(-b*x) + c
-
-
-
 
 
 if __name__ == '__main__':

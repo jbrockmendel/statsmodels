@@ -181,7 +181,7 @@ stub R2 C2  40.95038  40.65765
         tbl_c = SimpleTable(table1c_data, test1c_header, test1c_stubs, ltx_fmt=ltx_fmt1)
 
         def test_ltx_special_chars(self):
-        # Test for special characters (latex) in headers and stubs
+            # Test for special characters (latex) in headers and stubs
             desired = r"""
 \begin{tabular}{lcc}
 \toprule

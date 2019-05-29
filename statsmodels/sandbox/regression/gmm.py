@@ -1152,9 +1152,9 @@ class GMMResults(LikelihoodModelResults):
         # fit
 
         # TODO: don't do this when we want to change options
-#         if hasattr(self, '_cov_params'):
-#             #replace with decorator later
-#             return self._cov_params
+        #if hasattr(self, '_cov_params'):
+        #    #replace with decorator later
+        #    return self._cov_params
 
         # set defaults based on fit arguments
         if 'wargs' not in kwds:

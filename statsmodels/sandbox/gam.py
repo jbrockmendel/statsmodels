@@ -329,8 +329,8 @@ class AdditiveModel(object):
 
         return self.results
 
+
 class Model(GLM, AdditiveModel):
-#class Model(AdditiveModel):
     #TODO: what does GLM do? Is it actually used ?
     #only used in __init__, dropping it doesn't change results
     #but where gets family attached now? - weird, it's Gaussian in this case now
@@ -341,10 +341,10 @@ class Model(GLM, AdditiveModel):
 
     #niter = 2
 
-#    def __init__(self, exog, smoothers=None, family=family.Gaussian()):
-#        GLM.__init__(self, exog, family=family)
-#        AdditiveModel.__init__(self, exog, smoothers=smoothers)
-#        self.family = family
+    #def __init__(self, exog, smoothers=None, family=family.Gaussian()):
+    #    GLM.__init__(self, exog, family=family)
+    #    AdditiveModel.__init__(self, exog, smoothers=smoothers)
+    #    self.family = family
     def __init__(self, endog, exog, smoothers=None, family=families.Gaussian()):
         #self.family = family
         #TODO: inconsistent super __init__

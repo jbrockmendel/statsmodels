@@ -544,6 +544,6 @@ if __name__ == "__main__":
 #        dens = revrt(SMOOTH)
 
     except:
-#        ft = np.loadtxt('./ft_silver.csv')
-#        smooth = np.loadtxt('./smooth_silver.csv')
+        #ft = np.loadtxt('./ft_silver.csv')
+        #smooth = np.loadtxt('./smooth_silver.csv')
         print("Didn't get the estimates from the Silverman algorithm")
