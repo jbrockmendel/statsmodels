@@ -44,25 +44,23 @@ def test_all(close_figures, reset_randomstate):
     close_or_save(pdf, fig)
 
     # Tall and skinny
-    plt.figure(figsize=(4,12))
+    plt.figure(figsize=(4, 12))
     ax = plt.axes()
-    vals = np.arange(40)
     fig = dot_plot(points, ax=ax)
     ax.set_title("Tall and skinny dotplot")
     ax.set_xlabel("x axis label")
     close_or_save(pdf, fig)
 
     # Short and wide
-    plt.figure(figsize=(12,4))
+    plt.figure(figsize=(12, 4))
     ax = plt.axes()
-    vals = np.arange(40)
     fig = dot_plot(points, ax=ax, horizontal=False)
     ax.set_title("Short and wide dotplot")
     ax.set_ylabel("y axis label")
     close_or_save(pdf, fig)
 
     # Tall and skinny striped dotplot
-    plt.figure(figsize=(4,12))
+    plt.figure(figsize=(4, 12))
     ax = plt.axes()
     points = np.arange(40)
     fig = dot_plot(points, ax=ax, striped=True)
@@ -71,7 +69,7 @@ def test_all(close_figures, reset_randomstate):
     close_or_save(pdf, fig)
 
     # Short and wide striped
-    plt.figure(figsize=(12,4))
+    plt.figure(figsize=(12, 4))
     ax = plt.axes()
     points = np.arange(40)
     fig = dot_plot(points, ax=ax, striped=True, horizontal=False)
@@ -130,8 +128,9 @@ def test_all(close_figures, reset_randomstate):
     lines = ["ABCDEFGH"[np.random.randint(0, 8)] + "::" + str(k+1)
              for k in range(20)]
     fig = dot_plot(points, lines=lines, ax=ax, split_names="::",
-            horizontal=False)
-    txt = ax.set_title("Vertical dotplot with user-supplied labels in both margins")
+                   horizontal=False)
+    txt = ax.set_title("Vertical dotplot with user-supplied labels in "
+                       "both margins")
     txt.set_position((0.5, 1.06))
     close_or_save(pdf, fig)
 
@@ -144,7 +143,7 @@ def test_all(close_figures, reset_randomstate):
     marker_props = {k: {"color": "rgbc"[k], "marker": "osvp"[k],
                         "ms": 7, "alpha": 0.6} for k in range(4)}
     fig = dot_plot(points, lines=lines, styles=styles, ax=ax,
-            marker_props=marker_props)
+                   marker_props=marker_props)
     ax.set_title("Dotplot with custom colors and symbols")
     close_or_save(pdf, fig)
 
@@ -198,12 +197,12 @@ def test_all(close_figures, reset_randomstate):
     plt.clf()
     ax = plt.axes([0.1, 0.1, 0.75, 0.8])
     points = 5*np.random.normal(size=40)
-    lines = np.kron(range(20), (1,1))
-    intervals = [(1,3) for k in range(40)]
-    styles = np.kron(np.ones(20), (0,1)).astype(np.int32)
+    lines = np.kron(range(20), (1, 1))
+    intervals = [(1, 3) for k in range(40)]
+    styles = np.kron(np.ones(20), (0, 1)).astype(np.int32)
     styles = [["Cat", "Dog"][i] for i in styles]
     fig = dot_plot(points, intervals=intervals, lines=lines, styles=styles,
-            ax=ax, stacked=True)
+                   ax=ax, stacked=True)
     handles, labels = ax.get_legend_handles_labels()
     leg = plt.figlegend(handles, labels, "center right", numpoints=1,
                         handletextpad=0.0001)
@@ -215,8 +214,8 @@ def test_all(close_figures, reset_randomstate):
     plt.clf()
     ax = plt.axes([0.1, 0.1, 0.75, 0.8])
     fig = dot_plot(points, intervals=intervals, lines=lines,
-                  styles=styles, ax=ax, stacked=True,
-                  styles_order=["Dog", "Cat"])
+                   styles=styles, ax=ax, stacked=True,
+                   styles_order=["Dog", "Cat"])
     handles, labels = ax.get_legend_handles_labels()
     leg = plt.figlegend(handles, labels, "center right", numpoints=1,
                         handletextpad=0.0001)
@@ -228,12 +227,12 @@ def test_all(close_figures, reset_randomstate):
     plt.clf()
     ax = plt.axes([0.1, 0.1, 0.75, 0.8])
     points = 5*np.random.normal(size=40)
-    lines = np.kron(range(20), (1,1))
-    intervals = [(1,3) for k in range(40)]
-    styles = np.kron(np.ones(20), (0,1)).astype(np.int32)
+    lines = np.kron(range(20), (1, 1))
+    intervals = [(1, 3) for k in range(40)]
+    styles = np.kron(np.ones(20), (0, 1)).astype(np.int32)
     styles = [["Cat", "Dog"][i] for i in styles]
     fig = dot_plot(points, intervals=intervals, lines=lines, styles=styles,
-            ax=ax, stacked=True, horizontal=False)
+                   ax=ax, stacked=True, horizontal=False)
     handles, labels = ax.get_legend_handles_labels()
     leg = plt.figlegend(handles, labels, "center right", numpoints=1,
                         handletextpad=0.0001)
@@ -246,8 +245,8 @@ def test_all(close_figures, reset_randomstate):
     ax = plt.axes([0.1, 0.1, 0.75, 0.8])
     styles_order = ["Dog", "Cat"]
     fig = dot_plot(points, intervals=intervals, lines=lines,
-                  styles=styles, ax=ax, stacked=True,
-                  horizontal=False, styles_order=styles_order)
+                   styles=styles, ax=ax, stacked=True,
+                   horizontal=False, styles_order=styles_order)
     handles, labels = ax.get_legend_handles_labels()
     lh = dict(zip(labels, handles))
     handles = [lh[l] for l in styles_order]
@@ -261,12 +260,12 @@ def test_all(close_figures, reset_randomstate):
     plt.clf()
     ax = plt.axes([0.1, 0.1, 0.75, 0.8])
     points = 5*np.random.normal(size=40)
-    lines = np.kron(range(20), (1,1))
-    intervals = [(1,3) for k in range(40)]
-    styles = np.kron(np.ones(20), (0,1)).astype(np.int32)
+    lines = np.kron(range(20), (1, 1))
+    intervals = [(1, 3) for k in range(40)]
+    styles = np.kron(np.ones(20), (0, 1)).astype(np.int32)
     styles = [["Cat", "Dog"][i] for i in styles]
     fig = dot_plot(points, intervals=intervals, lines=lines, styles=styles,
-            ax=ax, stacked=True, striped=True, horizontal=False)
+                   ax=ax, stacked=True, striped=True, horizontal=False)
     handles, labels = ax.get_legend_handles_labels()
     leg = plt.figlegend(handles, labels, "center right", numpoints=1,
                         handletextpad=0.0001)
@@ -279,17 +278,17 @@ def test_all(close_figures, reset_randomstate):
     plt.clf()
     ax = plt.axes([0.1, 0.1, 0.75, 0.8])
     points = 5*np.random.normal(size=40)
-    lines = np.kron(range(20), (1,1))
-    intervals = [(1,3) for k in range(40)]
-    styles = np.kron(np.ones(20), (0,1)).astype(np.int32)
+    lines = np.kron(range(20), (1, 1))
+    intervals = [(1, 3) for k in range(40)]
+    styles = np.kron(np.ones(20), (0, 1)).astype(np.int32)
     styles = [["Cat", "Dog"][i] for i in styles]
     marker_props = {"Cat": {"color": "orange"},
                     "Dog": {"color": "purple"}}
     line_props = {"Cat": {"color": "orange"},
                   "Dog": {"color": "purple"}}
     fig = dot_plot(points, intervals=intervals, lines=lines, styles=styles,
-            ax=ax, stacked=True, marker_props=marker_props,
-            line_props=line_props)
+                   ax=ax, stacked=True, marker_props=marker_props,
+                   line_props=line_props)
     handles, labels = ax.get_legend_handles_labels()
     leg = plt.figlegend(handles, labels, "center right", numpoints=1,
                         handletextpad=0.0001)
@@ -301,17 +300,17 @@ def test_all(close_figures, reset_randomstate):
     plt.clf()
     ax = plt.axes([0.1, 0.1, 0.75, 0.8])
     points = 5*np.random.normal(size=40)
-    lines = np.kron(range(20), (1,1))
-    intervals = [(1,3) for k in range(40)]
-    styles = np.kron(np.ones(20), (0,1)).astype(np.int32)
+    lines = np.kron(range(20), (1, 1))
+    intervals = [(1, 3) for k in range(40)]
+    styles = np.kron(np.ones(20), (0, 1)).astype(np.int32)
     styles = [["Cat", "Dog"][i] for i in styles]
     marker_props = {"Cat": {"color": "orange"},
                     "Dog": {"color": "purple"}}
     line_props = {"Cat": {"color": "orange"},
                   "Dog": {"color": "purple"}}
     fig = dot_plot(points, intervals=intervals, lines=lines, styles=styles,
-            ax=ax, stacked=True, marker_props=marker_props,
-            line_props=line_props, horizontal=False)
+                   ax=ax, stacked=True, marker_props=marker_props,
+                   line_props=line_props, horizontal=False)
     handles, labels = ax.get_legend_handles_labels()
     leg = plt.figlegend(handles, labels, "center right", numpoints=1,
                         handletextpad=0.0001)
@@ -323,24 +322,25 @@ def test_all(close_figures, reset_randomstate):
     plt.clf()
     ax = plt.axes()
     points = range(30)
-    lines = np.kron(range(15), (1,1)).astype(np.int32)
-    styles = np.kron(np.ones(15), (0,1)).astype(np.int32)
-    sections = np.kron((0,1,2), np.ones(10)).astype(np.int32)
+    lines = np.kron(range(15), (1, 1)).astype(np.int32)
+    styles = np.kron(np.ones(15), (0, 1)).astype(np.int32)
+    sections = np.kron((0, 1, 2), np.ones(10)).astype(np.int32)
     sections = [["Axx", "Byy", "Czz"][k] for k in sections]
-    fig = dot_plot(points, lines=lines, styles=styles, sections=sections, ax=ax)
+    fig = dot_plot(points, lines=lines, styles=styles,
+                   sections=sections, ax=ax)
     ax.set_title("Dotplot with sections")
     close_or_save(pdf, fig)
 
     # Vertical dotplot with sections
     plt.clf()
-    ax = plt.axes([0.1,0.1,0.9,0.75])
+    ax = plt.axes([0.1, 0.1, 0.9, 0.75])
     points = range(30)
-    lines = np.kron(range(15), (1,1)).astype(np.int32)
-    styles = np.kron(np.ones(15), (0,1)).astype(np.int32)
-    sections = np.kron((0,1,2), np.ones(10)).astype(np.int32)
+    lines = np.kron(range(15), (1, 1)).astype(np.int32)
+    styles = np.kron(np.ones(15), (0, 1)).astype(np.int32)
+    sections = np.kron((0, 1, 2), np.ones(10)).astype(np.int32)
     sections = [["Axx", "Byy", "Czz"][k] for k in sections]
     fig = dot_plot(points, lines=lines, styles=styles,
-                  sections=sections, ax=ax, horizontal=False)
+                   sections=sections, ax=ax, horizontal=False)
     txt = ax.set_title("Vertical dotplot with sections")
     txt.set_position((0.5, 1.08))
     close_or_save(pdf, fig)
@@ -349,12 +349,13 @@ def test_all(close_figures, reset_randomstate):
     plt.clf()
     ax = plt.axes()
     points = range(30)
-    lines = np.kron(range(15), (1,1)).astype(np.int32)
-    styles = np.kron(np.ones(15), (0,1)).astype(np.int32)
-    sections = np.kron((0,1,2), np.ones(10)).astype(np.int32)
+    lines = np.kron(range(15), (1, 1)).astype(np.int32)
+    styles = np.kron(np.ones(15), (0, 1)).astype(np.int32)
+    sections = np.kron((0, 1, 2), np.ones(10)).astype(np.int32)
     sections = [["Axx", "Byy", "Czz"][k] for k in sections]
-    fig = dot_plot(points, lines=lines, styles=styles, sections=sections, ax=ax,
-            section_order=["Byy", "Axx", "Czz"])
+    fig = dot_plot(points, lines=lines, styles=styles,
+                   sections=sections, ax=ax,
+                   section_order=["Byy", "Axx", "Czz"])
     ax.set_title("Dotplot with sections in specified order")
     close_or_save(pdf, fig)
 
@@ -372,8 +373,8 @@ def test_all(close_figures, reset_randomstate):
     plt.clf()
     points = range(20)
     lines = ["%d::%d" % (i, 100+i) for i in range(20)]
-    fmt_left = lambda x : "lft_" + x
-    fmt_right = lambda x : "rgt_" + x
+    fmt_left = lambda x: "lft_" + x  # noqa:E731
+    fmt_right = lambda x: "rgt_" + x  # noqa:E731
     ax = plt.axes()
     fig = dot_plot(points, lines=lines, ax=ax, split_names="::",
                    fmt_left_name=fmt_left, fmt_right_name=fmt_right)
@@ -400,10 +401,10 @@ def test_all(close_figures, reset_randomstate):
         for k in range(np.random.randint(1, 4)):
             lines.append(ii)
         ii += 1
-    styles = np.kron(np.ones(20), (0,1)).astype(np.int32)
+    styles = np.kron(np.ones(20), (0, 1)).astype(np.int32)
     styles = [["Cat", "Dog"][i] for i in styles]
     fig = dot_plot(points, lines=lines, styles=styles,
-            ax=ax, stacked=True)
+                   ax=ax, stacked=True)
     handles, labels = ax.get_legend_handles_labels()
     leg = plt.figlegend(handles, labels, "center right", numpoints=1,
                         handletextpad=0.0001)

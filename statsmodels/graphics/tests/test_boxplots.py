@@ -24,24 +24,24 @@ def test_violinplot_beanplot(close_figures):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     violinplot(age, ax=ax, labels=labels,
-               plot_opts={'cutoff_val':5, 'cutoff_type':'abs',
-                          'label_fontsize':'small',
-                          'label_rotation':30})
+               plot_opts={'cutoff_val': 5, 'cutoff_type': 'abs',
+                          'label_fontsize': 'small',
+                          'label_rotation': 30})
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
     violinplot(age, ax=ax, labels=labels,
-               plot_opts={'cutoff_val':5, 'cutoff_type':'abs',
-                          'label_fontsize':'small',
-                          'label_rotation':30,
-                          'bw_factor':.2})
+               plot_opts={'cutoff_val': 5, 'cutoff_type': 'abs',
+                          'label_fontsize': 'small',
+                          'label_rotation': 30,
+                          'bw_factor': .2})
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
     beanplot(age, ax=ax, labels=labels,
-             plot_opts={'cutoff_val':5, 'cutoff_type':'abs',
-                        'label_fontsize':'small',
-                        'label_rotation':30})
+             plot_opts={'cutoff_val': 5, 'cutoff_type': 'abs',
+                        'label_fontsize': 'small',
+                        'label_rotation': 30})
 
     fig = plt.figure()
     ax = fig.add_subplot(111)

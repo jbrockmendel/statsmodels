@@ -1,7 +1,7 @@
 from __future__ import division
 from statsmodels.compat.python import iterkeys, zip, lrange, iteritems, range
 
-from numpy.testing import assert_, assert_raises
+from numpy.testing import assert_, assert_raises, assert_allclose
 import pandas as pd
 import pytest
 
@@ -47,7 +47,8 @@ def test_data_conversion(close_figures):
 
     data = {('ax', 'cx'): 1, ('bx', 'cx'): 2, ('ax', 'dx'): 3, ('bx', 'dx'): 4}
     mosaic(data, ax=ax[1, 0], title='compound dict', axes_label=False)
-    mosaic(data, ax=ax[2, 0], title='inverted keys dict', index=[1, 0], axes_label=False)
+    mosaic(data, ax=ax[2, 0], title='inverted keys dict', index=[1, 0],
+           axes_label=False)
     data = pandas.Series(data)
     mosaic(data, ax=ax[1, 1], title='compound series', axes_label=False)
     mosaic(data, ax=ax[2, 1], title='inverted keys series', index=[1, 0])
@@ -56,15 +57,20 @@ def test_data_conversion(close_figures):
     mosaic(data, ax=ax[2, 2], title='inverted keys list', index=[1, 0])
     data = np.array([[1, 2], [3, 4]])
     mosaic(data, ax=ax[1, 3], title='compound array', axes_label=False)
-    mosaic(data, ax=ax[2, 3], title='inverted keys array', index=[1, 0], axes_label=False)
+    mosaic(data, ax=ax[2, 3], title='inverted keys array', index=[1, 0],
+           axes_label=False)
 
     gender = ['male', 'male', 'male', 'female', 'female', 'female']
     pet = ['cat', 'dog', 'dog', 'cat', 'dog', 'cat']
     data = pandas.DataFrame({'gender': gender, 'pet': pet})
-    mosaic(data, ['gender'], ax=ax[3, 0], title='dataframe by key 1', axes_label=False)
-    mosaic(data, ['pet'], ax=ax[3, 1], title='dataframe by key 2', axes_label=False)
-    mosaic(data, ['gender', 'pet'], ax=ax[3, 2], title='both keys', axes_label=False)
-    mosaic(data, ['pet', 'gender'], ax=ax[3, 3], title='keys inverted', axes_label=False)
+    mosaic(data, ['gender'], ax=ax[3, 0], title='dataframe by key 1',
+           axes_label=False)
+    mosaic(data, ['pet'], ax=ax[3, 1], title='dataframe by key 2',
+           axes_label=False)
+    mosaic(data, ['gender', 'pet'], ax=ax[3, 2], title='both keys',
+           axes_label=False)
+    mosaic(data, ['pet', 'gender'], ax=ax[3, 3], title='keys inverted',
+           axes_label=False)
 
     plt.suptitle('testing data conversion (plot 1 of 4)')
 
@@ -83,19 +89,19 @@ def test_mosaic_simple(close_figures):
     # which colours should I use for the various categories?
     # put it into a dict
     props = {}
-    #males and females in blue and red
+    # males and females in blue and red
     props[('male',)] = {'color': 'b'}
     props[('female',)] = {'color': 'r'}
     # all the groups corresponding to ill groups have a different color
     for key in keys:
         if 'ill' in key:
             if 'male' in key:
-                props[key] = {'color': 'BlueViolet' , 'hatch': '+'}
+                props[key] = {'color': 'BlueViolet', 'hatch': '+'}
             else:
-                props[key] = {'color': 'Crimson' , 'hatch': '+'}
+                props[key] = {'color': 'Crimson', 'hatch': '+'}
     # mosaic of the data, with given gaps and colors
     mosaic(data, gap=0.05, properties=props, axes_label=False)
-    plt.suptitle('syntetic data, 4 categories (plot 2 of 4)')
+    plt.suptitle('synthetic data, 4 categories (plot 2 of 4)')
 
 
 @pytest.mark.matplotlib
@@ -127,7 +133,7 @@ def test_mosaic(close_figures):
     mosaic(datas, ['religious', 'cheated'], ax=ax[0, 1],
            title='by religiosity')
     mosaic(datas, ['rate_marriage', 'religious', 'cheated'], ax=ax[1, 0],
-           title='by both', labelizer=lambda k:'')
+           title='by both', labelizer=lambda k: '')
     ax[1, 0].set_xlabel('marriage rating')
     ax[1, 0].set_ylabel('religion status')
     mosaic(datas, ['religious', 'rate_marriage'], ax=ax[1, 1],
@@ -163,8 +169,9 @@ def test_mosaic_very_complex(close_figures):
             else:
                 ji = max(i, j)
                 ij = min(i, j)
-                temp_data = OrderedDict([((k[ij], k[ji]) + tuple(k[r] for r in m), v)
-                                            for k, v in iteritems(data)])
+                temp_data = OrderedDict([
+                    ((k[ij], k[ji]) + tuple(k[r] for r in m), v)
+                    for k, v in iteritems(data)])
 
                 keys = list(iterkeys(temp_data))
                 for k in keys:
@@ -173,7 +180,7 @@ def test_mosaic_very_complex(close_figures):
                     del temp_data[k]
                 mosaic(temp_data, ax=axes[i, j], axes_label=False,
                        properties=props, gap=0.05, horizontal=i > j)
-    plt.suptitle('old males should look bright red,  (plot 4 of 4)')
+    plt.suptitle('old males should look bright red, (plot 4 of 4)')
 
 
 @pytest.mark.matplotlib
@@ -185,12 +192,15 @@ def test_axes_labeling(close_figures):
     # the complete set of categories
     keys = list(product(*key_set))
     data = OrderedDict(zip(keys, rand(len(keys))))
-    lab = lambda k: ''.join(s[0] for s in k)
+
+    def lab(k):
+        return ''.join(s[0] for s in k)
+
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
     mosaic(data, ax=ax1, labelizer=lab, horizontal=True, label_rotation=45)
     mosaic(data, ax=ax2, labelizer=lab, horizontal=False,
            label_rotation=[0, 45, 90, 0])
-    #fig.tight_layout()
+    # fig.tight_layout()  # FIXME: enable or remove, dont comment-out
     fig.suptitle("correct alignment of the axes labels")
 
 
@@ -214,10 +224,7 @@ def test_mosaic_empty_cells(close_figures):
 
     ct = pd.crosstab(mydata.id1, mydata.id2)
     _, vals = mosaic(ct.T.unstack())
-    _, vals = mosaic(mydata, ['id1','id2'])
-
-
-eq = lambda x, y: assert_(np.allclose(x, y))
+    _, vals = mosaic(mydata, ['id1', 'id2'])
 
 
 def test_recursive_split():
@@ -241,13 +248,13 @@ def test_recursive_split():
 
 def test__reduce_dict():
     data = OrderedDict(zip(list(product('mf', 'oy', 'wn')), [1] * 8))
-    eq(_reduce_dict(data, ('m',)), 4)
-    eq(_reduce_dict(data, ('m', 'o')), 2)
-    eq(_reduce_dict(data, ('m', 'o', 'w')), 1)
+    assert_allclose(_reduce_dict(data, ('m',)), 4)
+    assert_allclose(_reduce_dict(data, ('m', 'o')), 2)
+    assert_allclose(_reduce_dict(data, ('m', 'o', 'w')), 1)
     data = OrderedDict(zip(list(product('mf', 'oy', 'wn')), lrange(8)))
-    eq(_reduce_dict(data, ('m',)), 6)
-    eq(_reduce_dict(data, ('m', 'o')), 1)
-    eq(_reduce_dict(data, ('m', 'o', 'w')), 0)
+    assert_allclose(_reduce_dict(data, ('m',)), 6)
+    assert_allclose(_reduce_dict(data, ('m', 'o')), 1)
+    assert_allclose(_reduce_dict(data, ('m', 'o', 'w')), 0)
 
 
 def test__key_splitting():
@@ -255,28 +262,28 @@ def test__key_splitting():
     base_rect = {tuple(): (0, 0, 1, 1)}
     res = _key_splitting(base_rect, ['a', 'b'], [1, 1], tuple(), True, 0)
     assert_(list(iterkeys(res)) == [('a',), ('b',)])
-    eq(res[('a',)], (0, 0, 0.5, 1))
-    eq(res[('b',)], (0.5, 0, 0.5, 1))
+    assert_allclose(res[('a',)], (0, 0, 0.5, 1))
+    assert_allclose(res[('b',)], (0.5, 0, 0.5, 1))
     # subdivide a in two sublevel
     res_bis = _key_splitting(res, ['c', 'd'], [1, 1], ('a',), False, 0)
     assert_(list(iterkeys(res_bis)) == [('a', 'c'), ('a', 'd'), ('b',)])
-    eq(res_bis[('a', 'c')], (0.0, 0.0, 0.5, 0.5))
-    eq(res_bis[('a', 'd')], (0.0, 0.5, 0.5, 0.5))
-    eq(res_bis[('b',)], (0.5, 0, 0.5, 1))
+    assert_allclose(res_bis[('a', 'c')], (0.0, 0.0, 0.5, 0.5))
+    assert_allclose(res_bis[('a', 'd')], (0.0, 0.5, 0.5, 0.5))
+    assert_allclose(res_bis[('b',)], (0.5, 0, 0.5, 1))
     # starting with a non empty tuple and uneven distribution
     base_rect = {('total',): (0, 0, 1, 1)}
     res = _key_splitting(base_rect, ['a', 'b'], [1, 2], ('total',), True, 0)
     assert_(list(iterkeys(res)) == [('total',) + (e,) for e in ['a', 'b']])
-    eq(res[('total', 'a')], (0, 0, 1 / 3, 1))
-    eq(res[('total', 'b')], (1 / 3, 0, 2 / 3, 1))
+    assert_allclose(res[('total', 'a')], (0, 0, 1 / 3, 1))
+    assert_allclose(res[('total', 'b')], (1 / 3, 0, 2 / 3, 1))
 
 
 def test_proportion_normalization():
     # extremes should give the whole set, as well
     # as if 0 is inserted
-    eq(_normalize_split(0.), [0.0, 0.0, 1.0])
-    eq(_normalize_split(1.), [0.0, 1.0, 1.0])
-    eq(_normalize_split(2.), [0.0, 1.0, 1.0])
+    assert_allclose(_normalize_split(0.), [0.0, 0.0, 1.0])
+    assert_allclose(_normalize_split(1.), [0.0, 1.0, 1.0])
+    assert_allclose(_normalize_split(2.), [0.0, 1.0, 1.0])
     # negative values should raise ValueError
     assert_raises(ValueError, _normalize_split, -1)
     assert_raises(ValueError, _normalize_split, [1., -1])
@@ -285,17 +292,17 @@ def test_proportion_normalization():
     assert_raises(ValueError, _normalize_split, [0.])
     assert_raises(ValueError, _normalize_split, [0., 0.])
     # one-element array should return the whole interval
-    eq(_normalize_split([0.5]), [0.0, 1.0])
-    eq(_normalize_split([1.]), [0.0, 1.0])
-    eq(_normalize_split([2.]), [0.0, 1.0])
+    assert_allclose(_normalize_split([0.5]), [0.0, 1.0])
+    assert_allclose(_normalize_split([1.]), [0.0, 1.0])
+    assert_allclose(_normalize_split([2.]), [0.0, 1.0])
     # simple division should give two pieces
     for x in [0.3, 0.5, 0.9]:
-        eq(_normalize_split(x), [0., x, 1.0])
+        assert_allclose(_normalize_split(x), [0., x, 1.0])
     # multiple division should split as the sum of the components
     for x, y in [(0.25, 0.5), (0.1, 0.8), (10., 30.)]:
-        eq(_normalize_split([x, y]), [0., x / (x + y), 1.0])
+        assert_allclose(_normalize_split([x, y]), [0., x / (x + y), 1.0])
     for x, y, z in [(1., 1., 1.), (0.1, 0.5, 0.7), (10., 30., 40)]:
-        eq(_normalize_split(
+        assert_allclose(_normalize_split(
             [x, y, z]), [0., x / (x + y + z), (x + y) / (x + y + z), 1.0])
 
 
@@ -305,19 +312,19 @@ def test_false_split():
     pure_square = [0., 0., 1., 1.]
     conf_h = dict(proportion=[1], gap=0.0, horizontal=True)
     conf_v = dict(proportion=[1], gap=0.0, horizontal=False)
-    eq(_split_rect(*pure_square, **conf_h), pure_square)
-    eq(_split_rect(*pure_square, **conf_v), pure_square)
+    assert_allclose(_split_rect(*pure_square, **conf_h), pure_square)
+    assert_allclose(_split_rect(*pure_square, **conf_v), pure_square)
     conf_h = dict(proportion=[1], gap=0.5, horizontal=True)
     conf_v = dict(proportion=[1], gap=0.5, horizontal=False)
-    eq(_split_rect(*pure_square, **conf_h), pure_square)
-    eq(_split_rect(*pure_square, **conf_v), pure_square)
+    assert_allclose(_split_rect(*pure_square, **conf_h), pure_square)
+    assert_allclose(_split_rect(*pure_square, **conf_v), pure_square)
 
     # identity on a void rectangle should not give anything strange
     null_square = [0., 0., 0., 0.]
     conf = dict(proportion=[1], gap=0.0, horizontal=True)
-    eq(_split_rect(*null_square, **conf), null_square)
+    assert_allclose(_split_rect(*null_square, **conf), null_square)
     conf = dict(proportion=[1], gap=1.0, horizontal=True)
-    eq(_split_rect(*null_square, **conf), null_square)
+    assert_allclose(_split_rect(*null_square, **conf), null_square)
 
     # splitting a negative rectangle should raise error
     neg_square = [0., 0., -1., 0.]
@@ -336,49 +343,59 @@ def test_rect_pure_split():
     # division in two equal pieces from the perfect square
     h_2split = [(0.0, 0.0, 0.5, 1.0), (0.5, 0.0, 0.5, 1.0)]
     conf_h = dict(proportion=[1, 1], gap=0.0, horizontal=True)
-    eq(_split_rect(*pure_square, **conf_h), h_2split)
+    assert_allclose(_split_rect(*pure_square, **conf_h), h_2split)
 
     v_2split = [(0.0, 0.0, 1.0, 0.5), (0.0, 0.5, 1.0, 0.5)]
     conf_v = dict(proportion=[1, 1], gap=0.0, horizontal=False)
-    eq(_split_rect(*pure_square, **conf_v), v_2split)
+    assert_allclose(_split_rect(*pure_square, **conf_v), v_2split)
 
     # division in two non-equal pieces from the perfect square
     h_2split = [(0.0, 0.0, 1 / 3, 1.0), (1 / 3, 0.0, 2 / 3, 1.0)]
     conf_h = dict(proportion=[1, 2], gap=0.0, horizontal=True)
-    eq(_split_rect(*pure_square, **conf_h), h_2split)
+    assert_allclose(_split_rect(*pure_square, **conf_h), h_2split)
 
     v_2split = [(0.0, 0.0, 1.0, 1 / 3), (0.0, 1 / 3, 1.0, 2 / 3)]
     conf_v = dict(proportion=[1, 2], gap=0.0, horizontal=False)
-    eq(_split_rect(*pure_square, **conf_v), v_2split)
+    assert_allclose(_split_rect(*pure_square, **conf_v), v_2split)
 
     # division in three equal pieces from the perfect square
-    h_2split = [(0.0, 0.0, 1 / 3, 1.0), (1 / 3, 0.0, 1 / 3, 1.0), (2 / 3, 0.0,
-                 1 / 3, 1.0)]
+    h_2split = [
+        (0.0, 0.0, 1 / 3, 1.0),
+        (1 / 3, 0.0, 1 / 3, 1.0),
+        (2 / 3, 0.0, 1 / 3, 1.0)]
     conf_h = dict(proportion=[1, 1, 1], gap=0.0, horizontal=True)
-    eq(_split_rect(*pure_square, **conf_h), h_2split)
+    assert_allclose(_split_rect(*pure_square, **conf_h), h_2split)
 
-    v_2split = [(0.0, 0.0, 1.0, 1 / 3), (0.0, 1 / 3, 1.0, 1 / 3), (0.0, 2 / 3,
-                 1.0, 1 / 3)]
+    v_2split = [
+        (0.0, 0.0, 1.0, 1 / 3),
+        (0.0, 1 / 3, 1.0, 1 / 3),
+        (0.0, 2 / 3, 1.0, 1 / 3)]
     conf_v = dict(proportion=[1, 1, 1], gap=0.0, horizontal=False)
-    eq(_split_rect(*pure_square, **conf_v), v_2split)
+    assert_allclose(_split_rect(*pure_square, **conf_v), v_2split)
 
     # division in three non-equal pieces from the perfect square
-    h_2split = [(0.0, 0.0, 1 / 4, 1.0), (1 / 4, 0.0, 1 / 2, 1.0), (3 / 4, 0.0,
-                 1 / 4, 1.0)]
+    h_2split = [
+        (0.0, 0.0, 1 / 4, 1.0),
+        (1 / 4, 0.0, 1 / 2, 1.0),
+        (3 / 4, 0.0, 1 / 4, 1.0)]
     conf_h = dict(proportion=[1, 2, 1], gap=0.0, horizontal=True)
-    eq(_split_rect(*pure_square, **conf_h), h_2split)
+    assert_allclose(_split_rect(*pure_square, **conf_h), h_2split)
 
-    v_2split = [(0.0, 0.0, 1.0, 1 / 4), (0.0, 1 / 4, 1.0, 1 / 2), (0.0, 3 / 4,
-                 1.0, 1 / 4)]
+    v_2split = [
+        (0.0, 0.0, 1.0, 1 / 4),
+        (0.0, 1 / 4, 1.0, 1 / 2),
+        (0.0, 3 / 4, 1.0, 1 / 4)]
     conf_v = dict(proportion=[1, 2, 1], gap=0.0, horizontal=False)
-    eq(_split_rect(*pure_square, **conf_v), v_2split)
+    assert_allclose(_split_rect(*pure_square, **conf_v), v_2split)
 
     # splitting on a void rectangle should give multiple void
     null_square = [0., 0., 0., 0.]
     conf = dict(proportion=[1, 1], gap=0.0, horizontal=True)
-    eq(_split_rect(*null_square, **conf), [null_square, null_square])
+    assert_allclose(_split_rect(*null_square, **conf),
+                    [null_square, null_square])
     conf = dict(proportion=[1, 2], gap=1.0, horizontal=True)
-    eq(_split_rect(*null_square, **conf), [null_square, null_square])
+    assert_allclose(_split_rect(*null_square, **conf),
+                    [null_square, null_square])
 
 
 def test_rect_deformed_split():
@@ -386,20 +403,20 @@ def test_rect_deformed_split():
     # division in two equal pieces from the perfect square
     h_2split = [(1.0, -1.0, 0.5, 0.5), (1.5, -1.0, 0.5, 0.5)]
     conf_h = dict(proportion=[1, 1], gap=0.0, horizontal=True)
-    eq(_split_rect(*non_pure_square, **conf_h), h_2split)
+    assert_allclose(_split_rect(*non_pure_square, **conf_h), h_2split)
 
     v_2split = [(1.0, -1.0, 1.0, 0.25), (1.0, -0.75, 1.0, 0.25)]
     conf_v = dict(proportion=[1, 1], gap=0.0, horizontal=False)
-    eq(_split_rect(*non_pure_square, **conf_v), v_2split)
+    assert_allclose(_split_rect(*non_pure_square, **conf_v), v_2split)
 
     # division in two non-equal pieces from the perfect square
     h_2split = [(1.0, -1.0, 1 / 3, 0.5), (1 + 1 / 3, -1.0, 2 / 3, 0.5)]
     conf_h = dict(proportion=[1, 2], gap=0.0, horizontal=True)
-    eq(_split_rect(*non_pure_square, **conf_h), h_2split)
+    assert_allclose(_split_rect(*non_pure_square, **conf_h), h_2split)
 
     v_2split = [(1.0, -1.0, 1.0, 1 / 6), (1.0, 1 / 6 - 1, 1.0, 2 / 6)]
     conf_v = dict(proportion=[1, 2], gap=0.0, horizontal=False)
-    eq(_split_rect(*non_pure_square, **conf_v), v_2split)
+    assert_allclose(_split_rect(*non_pure_square, **conf_v), v_2split)
 
 
 def test_gap_split():
@@ -407,24 +424,24 @@ def test_gap_split():
 
     # null split
     conf_h = dict(proportion=[1], gap=1.0, horizontal=True)
-    eq(_split_rect(*pure_square, **conf_h), pure_square)
+    assert_allclose(_split_rect(*pure_square, **conf_h), pure_square)
 
     # equal split
     h_2split = [(0.0, 0.0, 0.25, 1.0), (0.75, 0.0, 0.25, 1.0)]
     conf_h = dict(proportion=[1, 1], gap=1.0, horizontal=True)
-    eq(_split_rect(*pure_square, **conf_h), h_2split)
+    assert_allclose(_split_rect(*pure_square, **conf_h), h_2split)
 
     # disequal split
     h_2split = [(0.0, 0.0, 1 / 6, 1.0), (0.5 + 1 / 6, 0.0, 1 / 3, 1.0)]
     conf_h = dict(proportion=[1, 2], gap=1.0, horizontal=True)
-    eq(_split_rect(*pure_square, **conf_h), h_2split)
+    assert_allclose(_split_rect(*pure_square, **conf_h), h_2split)
 
 
 @pytest.mark.matplotlib
 def test_default_arg_index(close_figures):
-    # 2116
-    df = pd.DataFrame({'size' : ['small', 'large', 'large', 'small', 'large',
-                                 'small'],
-                       'length' : ['long', 'short', 'short', 'long', 'long',
-                                   'short']})
+    # GH#2116
+    df = pd.DataFrame({'size': ['small', 'large', 'large', 'small', 'large',
+                                'small'],
+                       'length': ['long', 'short', 'short', 'long', 'long',
+                                  'short']})
     assert_raises(ValueError, mosaic, data=df, title='foobar')

@@ -30,6 +30,7 @@ if [ "$LINT" == true ]; then
         statsmodels/genmod/_tweedie_compound_poisson.py \
         statsmodels/genmod/tests/results/ \
         statsmodels/graphics/tsaplots.py \
+        statsmodels/graphics/tests/ \
         statsmodels/emplike/tests/ \
         statsmodels/examples/tests/ \
         statsmodels/iolib/smpickle.py \
