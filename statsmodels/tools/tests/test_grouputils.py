@@ -34,7 +34,7 @@ class CheckGrouping(object):
         np.testing.assert_(not index.equals(self.grouping.index))
 
         # make sure it copied
-        if hasattr(sorted_data, 'equals'): # newer pandas
+        if hasattr(sorted_data, 'equals'):  # newer pandas
             np.testing.assert_(not sorted_data.equals(self.data))
 
         # 2d arrays
@@ -62,21 +62,21 @@ class CheckGrouping(object):
         np.testing.assert_(isinstance(sorted_data, np.ndarray))
 
     @pytest.mark.xfail(condition=PY37,
-                       reason='Unexplained conversion to complex on Python 3.7')
+                       reason='Unexplained conversion to complex on PY37')
     def test_transform_dataframe(self):
         names = self.data.index.names
         transformed_dataframe = self.grouping.transform_dataframe(
                                             self.data,
-                                            lambda x : x.mean(),
+                                            lambda x: x.mean(),
                                             level=0)
         grouped = self.data.reset_index().groupby(names[0])
-        expected = grouped.apply(lambda x : x.mean())[self.data.columns]
+        expected = grouped.apply(lambda x: x.mean())[self.data.columns]
         np.testing.assert_array_equal(transformed_dataframe,
                                       expected.values)
 
         if len(names) > 1:
             transformed_dataframe = self.grouping.transform_dataframe(
-                                            self.data, lambda x : x.mean(),
+                                            self.data, lambda x: x.mean(),
                                             level=1)
             grouped = self.data.reset_index().groupby(names[1])
             expected = grouped.apply(lambda x: x.mean())[self.data.columns]
@@ -84,12 +84,12 @@ class CheckGrouping(object):
                                           expected.values)
 
     @pytest.mark.xfail(condition=PY37,
-                       reason='Unexplained conversion to complex on Python 3.7')
+                       reason='Unexplained conversion to complex on PY37')
     def test_transform_array(self):
         names = self.data.index.names
         transformed_array = self.grouping.transform_array(
                                             self.data.values,
-                                            lambda x : x.mean(),
+                                            lambda x: x.mean(),
                                             level=0)
         grouped = self.data.reset_index().groupby(names[0])
         expected = grouped.apply(lambda x: x.mean())[self.data.columns]
@@ -99,18 +99,17 @@ class CheckGrouping(object):
         if len(names) > 1:
             transformed_array = self.grouping.transform_array(
                                             self.data.values,
-                                            lambda x : x.mean(), level=1)
+                                            lambda x: x.mean(), level=1)
             grouped = self.data.reset_index().groupby(names[1])
             expected = grouped.apply(lambda x: x.mean())[self.data.columns]
             np.testing.assert_array_equal(transformed_array,
                                           expected.values)
 
-
     def test_transform_slices(self):
         names = self.data.index.names
         transformed_slices = self.grouping.transform_slices(
                                             self.data.values,
-                                            lambda x, idx : x.mean(0),
+                                            lambda x, idx: x.mean(0),
                                             level=0)
         expected = self.data.reset_index().groupby(names[0]).mean()[
                                                     self.data.columns]
@@ -120,7 +119,7 @@ class CheckGrouping(object):
         if len(names) > 1:
             transformed_slices = self.grouping.transform_slices(
                                             self.data.values,
-                                            lambda x, idx : x.mean(0),
+                                            lambda x, idx: x.mean(0),
                                             level=1)
             expected = self.data.reset_index().groupby(names[1]
                                                        ).mean()[
@@ -146,7 +145,7 @@ class CheckGrouping(object):
         if len(self.grouping.group_names) > 1:
             self.grouping.dummy_sparse(level=1)
             expected = categorical(data.index.get_level_values(1).values,
-                    drop=True)
+                                   drop=True)
             np.testing.assert_equal(self.grouping._dummies.toarray(),
                                     expected)
 
@@ -185,8 +184,8 @@ def test_init_api():
     # check shape
     np.testing.assert_array_equal(grouping.index_shape, (11, 20))
     # check index_int
-    np.testing.assert_array_equal(grouping.labels,
-      [[ 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    np.testing.assert_array_equal(grouping.labels, [
+        [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
          5, 5, 5, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
          8, 8, 8, 8, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
          4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -199,7 +198,7 @@ def test_init_api():
          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3, 3, 3,
          3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0,
          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
          17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
          14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
          11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7,
@@ -236,7 +235,6 @@ def test_init_api():
     np.testing.assert_array_equal(grouping.group_names,
                                   ['educ', 'income', 'TVnews'])
     np.testing.assert_array_equal(grouping.index_shape, (7, 24, 8))
-
 
     # single-variable index grouping
     index_group = multi_index_panel.get_level_values(0)
@@ -322,7 +320,6 @@ def test_dummy_sparse():
                          [0, 0, 1],
                          [1, 0, 0]], dtype=np.int8)
     assert_equal(result, expected)
-
 
     # current behavior with missing groups
     g = np.array([0, 0, 2, 0, 2, 0])
