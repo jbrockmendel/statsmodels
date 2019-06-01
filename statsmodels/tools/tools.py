@@ -17,7 +17,7 @@ def _make_dictnames(tmp_arr, offset=0):
     """
     col_map = {}
     for i, col_name in enumerate(tmp_arr):
-        col_map.update({i+offset : col_name})
+        col_map.update({i+offset: col_name})
     return col_map
 
 
@@ -136,11 +136,9 @@ def categorical(data, col=None, dictnames=False, drop=False, ):
     >>> design2 = sm.tools.categorical(struct_ar, col='str_instr', drop=True)
     '''
     if isinstance(col, (list, tuple)):
-        try:
-            assert len(col) == 1
-            col = col[0]
-        except:
+        if len(col) != 1:
             raise ValueError("Can only convert one column at a time")
+        col = col[0]
 
     # TODO: add a NameValidator function
     # catch recarrays and structured arrays
@@ -173,7 +171,7 @@ def categorical(data, col=None, dictnames=False, drop=False, ):
         if col is None:
             try:
                 col = data.dtype.names[0]
-            except:
+            except (AttributeError, TypeError, IndexError):
                 col = 'var'
         # TODO: the above needs to be made robust because there could be many
         # var_yes, var_no varaibles for instance.
@@ -264,12 +262,13 @@ def add_constant(data, prepend=True, has_constant='skip'):
     """
     if _is_using_pandas(data, None) or _is_recarray(data):
         from statsmodels.tsa.tsatools import add_trend
-        return add_trend(data, trend='c', prepend=prepend, has_constant=has_constant)
+        return add_trend(data, trend='c', prepend=prepend,
+                         has_constant=has_constant)
 
     # Special case for NumPy
     x = np.asanyarray(data)
     if x.ndim == 1:
-        x = x[:,None]
+        x = x[:, None]
     elif x.ndim > 2:
         raise ValueError('Only implementd 2-dimensional arrays')
 
@@ -492,6 +491,7 @@ def maybe_unwrap_results(results):
     routines.
     """
     return getattr(results, '_results', results)
+
 
 class Bunch(dict):
     """

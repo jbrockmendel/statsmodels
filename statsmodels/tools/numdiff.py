@@ -39,10 +39,12 @@ without dependencies.
 # http://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm
 #    objective: sum((y-f(beta,x)**2),   Jacobian = d f/d beta
 #    and not d objective/d beta as in MLE Greene
-#    similar: http://crsouza.blogspot.com/2009/11/neural-network-learning-by-levenberg_18.html#hessian
+#    similar:
+#        http://crsouza.blogspot.com/2009/11/neural-network-learning-by-levenberg_18.html#hessian
 #
 # in example: if J = d x*beta / d beta then J'J == X'X
-#    similar to http://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm
+#    similar to
+#        http://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm
 from __future__ import print_function
 from statsmodels.compat.python import range
 import numpy as np
@@ -270,16 +272,18 @@ def approx_hess1(x, f, epsilon=None, args=(), kwargs={}, return_grad=False):
     else:
         return hess
 
-approx_hess1.__doc__ = _hessian_docs % dict(scale="3",
-extra_params="""return_grad : bool
-        Whether or not to also return the gradient
-""",
-extra_returns="""grad : nparray
-        Gradient if return_grad == True
-""",
-equation_number="7",
-equation="""1/(d_j*d_k) * ((f(x + d[j]*e[j] + d[k]*e[k]) - f(x + d[j]*e[j])))
-""")
+
+approx_hess1.__doc__ = _hessian_docs % dict(
+    scale="3",
+    extra_params="""return_grad : bool
+            Whether or not to also return the gradient
+    """,
+    extra_returns="""grad : nparray
+            Gradient if return_grad == True
+    """,
+    equation_number="7",
+    equation="""1/(d_j*d_k) * ((f(x + d[j]*e[j] + d[k]*e[k]) - f(x + d[j]*e[j])))
+    """)
 
 
 def approx_hess2(x, f, epsilon=None, args=(), kwargs={}, return_grad=False):
@@ -312,26 +316,27 @@ def approx_hess2(x, f, epsilon=None, args=(), kwargs={}, return_grad=False):
         return hess
 
 
-approx_hess2.__doc__ = _hessian_docs % dict(scale="3",
-extra_params="""return_grad : bool
-        Whether or not to also return the gradient
-""",
-extra_returns="""grad : nparray
-        Gradient if return_grad == True
-""",
-equation_number="8",
-equation = """1/(2*d_j*d_k) * ((f(x + d[j]*e[j] + d[k]*e[k]) - f(x + d[j]*e[j])) -
-                 (f(x + d[k]*e[k]) - f(x)) +
-                 (f(x - d[j]*e[j] - d[k]*e[k]) - f(x + d[j]*e[j])) -
-                 (f(x - d[k]*e[k]) - f(x)))
-""")
+approx_hess2.__doc__ = _hessian_docs % dict(
+    scale="3",
+    extra_params="""return_grad : bool
+            Whether or not to also return the gradient
+    """,
+    extra_returns="""grad : nparray
+            Gradient if return_grad == True
+    """,
+    equation_number="8",
+    equation="""1/(2*d_j*d_k) * ((f(x + d[j]*e[j] + d[k]*e[k]) - f(x + d[j]*e[j])) -
+                   (f(x + d[k]*e[k]) - f(x)) +
+                   (f(x - d[j]*e[j] - d[k]*e[k]) - f(x + d[j]*e[j])) -
+                   (f(x - d[k]*e[k]) - f(x)))
+    """)
 
 
 def approx_hess3(x, f, epsilon=None, args=(), kwargs={}):
     n = len(x)
     h = _get_epsilon(x, 4, epsilon, n)
     ee = np.diag(h)
-    hess = np.outer(h,h)
+    hess = np.outer(h, h)
 
     for i in range(n):
         for j in range(i, n):
@@ -343,12 +348,14 @@ def approx_hess3(x, f, epsilon=None, args=(), kwargs={}):
             hess[j, i] = hess[i, j]
     return hess
 
-approx_hess3.__doc__ = _hessian_docs % dict(scale="4", extra_params="",
-                                            extra_returns="",
-                                            equation_number="9",
-equation = """1/(4*d_j*d_k) * ((f(x + d[j]*e[j] + d[k]*e[k]) - f(x + d[j]*e[j]
-                                                     - d[k]*e[k])) -
-                 (f(x - d[j]*e[j] + d[k]*e[k]) - f(x - d[j]*e[j]
-                                                     - d[k]*e[k]))""")
+
+approx_hess3.__doc__ = _hessian_docs % dict(
+    scale="4", extra_params="",
+    extra_returns="",
+    equation_number="9",
+    equation="""1/(4*d_j*d_k) * ((f(x + d[j]*e[j] + d[k]*e[k]) - f(x + d[j]*e[j]
+                                                       - d[k]*e[k])) -
+                   (f(x - d[j]*e[j] + d[k]*e[k]) - f(x - d[j]*e[j]
+                                                       - d[k]*e[k]))""")
 approx_hess = approx_hess3
 approx_hess.__doc__ += "\n    This is an alias for approx_hess3"

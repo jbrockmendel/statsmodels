@@ -2,6 +2,7 @@
 from __future__ import print_function
 from statsmodels.compat.python import reduce
 import sys
+import os
 from os.path import dirname
 
 
@@ -20,15 +21,12 @@ def _show_versions_only():
     print("\nINSTALLED VERSIONS")
     print("------------------")
     print("Python: %d.%d.%d.%s.%s" % sys.version_info[:])
-    try:
-        import os
-        (sysname, nodename, release, version, machine) = os.uname()
-        print("OS: %s %s %s %s" % (sysname, release, version, machine))
-        print("byteorder: %s" % sys.byteorder)
-        print("LC_ALL: %s" % os.environ.get('LC_ALL', "None"))
-        print("LANG: %s" % os.environ.get('LANG', "None"))
-    except:
-        pass
+    (sysname, nodename, release, version, machine) = os.uname()
+    print("OS: %s %s %s %s" % (sysname, release, version, machine))
+    print("byteorder: %s" % sys.byteorder)
+    print("LC_ALL: %s" % os.environ.get('LC_ALL', "None"))
+    print("LANG: %s" % os.environ.get('LANG', "None"))
+
     try:
         import statsmodels
         has_sm = True
@@ -125,7 +123,8 @@ def _show_versions_only():
 
     try:
         import pytest
-        print("pytest: %s (%s)" % (safe_version(pytest), dirname(pytest.__file__)))
+        print("pytest: %s (%s)" % (safe_version(pytest),
+                                   dirname(pytest.__file__)))
     except ImportError:
         print("pytest: Not installed")
 
@@ -144,15 +143,11 @@ def show_versions(show_dirs=True):
     print("\nINSTALLED VERSIONS")
     print("------------------")
     print("Python: %d.%d.%d.%s.%s" % sys.version_info[:])
-    try:
-        import os
-        (sysname, nodename, release, version, machine) = os.uname()
-        print("OS: %s %s %s %s" % (sysname, release, version, machine))
-        print("byteorder: %s" % sys.byteorder)
-        print("LC_ALL: %s" % os.environ.get('LC_ALL', "None"))
-        print("LANG: %s" % os.environ.get('LANG', "None"))
-    except:
-        pass
+    (sysname, nodename, release, version, machine) = os.uname()
+    print("OS: %s %s %s %s" % (sysname, release, version, machine))
+    print("byteorder: %s" % sys.byteorder)
+    print("LC_ALL: %s" % os.environ.get('LC_ALL', "None"))
+    print("LANG: %s" % os.environ.get('LANG', "None"))
 
     try:
         import statsmodels
@@ -266,7 +261,8 @@ def show_versions(show_dirs=True):
 
     try:
         import pytest
-        print("pytest: %s (%s)" % (safe_version(pytest), dirname(pytest.__file__)))
+        print("pytest: %s (%s)" % (safe_version(pytest),
+                                   dirname(pytest.__file__)))
     except ImportError:
         print("pytest: Not installed")
 
@@ -278,6 +274,7 @@ def show_versions(show_dirs=True):
         print("virtualenv: Not installed")
 
     print("\n")
+
 
 if __name__ == "__main__":
     show_versions()

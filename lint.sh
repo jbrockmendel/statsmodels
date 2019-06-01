@@ -73,10 +73,8 @@ if [ "$LINT" == true ]; then
         statsmodels/stats/tests/test_qsturng.py \
         statsmodels/stats/tests/test_regularized_covariance.py \
         statsmodels/stats/tests/results/ \
-        statsmodels/tools/linalg.py \
-        statsmodels/tools/web.py \
+        statsmodels/tools/*.py \
         statsmodels/tools/tests/test_linalg.py \
-        statsmodels/tools/decorators.py \
         statsmodels/tools/tests/test_decorators.py \
         statsmodels/tsa/adfvalues.py \
         statsmodels/tsa/base/tests/test_datetools.py \
@@ -89,7 +87,6 @@ if [ "$LINT" == true ]; then
         statsmodels/tsa/statespace/ \
         statsmodels/tsa/tests/results/ \
         statsmodels/conftest.py \
-        statsmodels/tools/sm_exceptions.py \
         examples/ \
         tools/ \
         setup.py
